@@ -4,6 +4,7 @@ from typing import List
 from loguru import logger
 from websocket import create_connection
 
+from src.kraken_api.trade import Trade
 
 
 class KrakenWebsocketTradeAPI:
@@ -78,3 +79,29 @@ class KrakenWebsocketTradeAPI:
             )
 
         return trades
+
+    def is_done(self) -> bool:
+        """The websocket never stops, so we never stop fetching trades."""
+        return False
+
+    @staticmethod
+    def to_ms(timestamp: str) -> int:
+        """
+        A function that transforms a timestamps expressed
+        as a string like this '2024-06-17T09:36:39.467866Z'
+        into a timestamp expressed in milliseconds.
+
+        Args:
+            timestamp (str): A timestamp expressed as a string.
+
+        Returns:
+            int: A timestamp expressed in milliseconds.
+        """
+        # parse a string like this '2024-06-17T09:36:39.467866Z'
+        # into a datetime object assuming UTC timezone
+        # and then transform this datetime object into Unix timestamp
+        # expressed in milliseconds
+        from datetime import datetime, timezone
+
+        timestamp = datetime.fromisoformat(timestamp[:-1]).replace(tzinfo=timezone.utc)
+        return int(timestamp.timestamp() * 1000)
