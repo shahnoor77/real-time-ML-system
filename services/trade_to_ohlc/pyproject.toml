@@ -10,6 +10,7 @@ python = "^3.10"
 quixstreams = "2.5.1"
 python-dotenv = "1.0.1"
 pydantic-settings = "2.3.0"
+loguru = "0.7.2"
 
 
 [build-system]
