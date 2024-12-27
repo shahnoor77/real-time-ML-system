@@ -1,3 +1,4 @@
+
 name: redpanda-quickstart-one-broker
 networks:
   redpanda_network:
@@ -62,4 +63,4 @@ services:
     ports:
       - 8080:8080
     depends_on:
-      - redpanda-0cd
+      - redpanda-0

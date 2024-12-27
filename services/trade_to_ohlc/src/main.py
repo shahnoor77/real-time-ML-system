@@ -2,10 +2,10 @@ from quixstreams import Application
 from datetime import timedelta
 from loguru import logger
 def trade_to_ohlc(
-    kafka_input_topic: str,
-    kafka_output_topic: str,
+    kafka_input_topic   : str,
+    kafka_output_topic  : str,
     kafka_broker_address: str,
-    ohlc_window_seconds: int,
+    ohlc_window_seconds : int,
 ) -> None:
     """
     Reads trades from the Kafka input topic,
@@ -22,13 +22,13 @@ def trade_to_ohlc(
         None
     """
     app = Application(
-        broker_address    = kafka_broker_address,
+        broker_address    =  kafka_broker_address,
         consumer_group    = "trade_to_ohlc",
         #auto_offset_reset = "earliest", # process all message from the input topic when this service starts
         #auto_create_reset = "latest",   #forget about the past messages, poduce only the once coming that moment 
     )
     # Specify input and output topics for this application
-    input_topic = app.topic(name=kafka_input_topic, value_serializer='json')
+    input_topic  = app.topic(name=kafka_input_topic, value_serializer='json')
     output_topic = app.topic(name=kafka_output_topic, value_serializer='json')
 
     # Create a streaming DataFrame
@@ -82,7 +82,7 @@ def trade_to_ohlc(
     # Adding a timestamp key
     sdf['timestamp']  = sdf['end']
 
-    # let's keep only the keys we want in our final message
+    # let's keep only the keys we want in our final message!
     sdf = sdf[['timestamp', 'open', 'high', 'low', 'close', 'product_id']]
     # Apply transformations to the incoming data-end
 
@@ -97,10 +97,10 @@ if __name__ == '__main__':
     from src.config import config
 
     trade_to_ohlc(
-        kafka_input_topic=config.kafka_input_topic,
-        kafka_output_topic=config.kafka_output_topic,
-        kafka_broker_address=config.kafka_broker_address,
-        ohlc_window_seconds=config.ohlc_window_seconds,
+        kafka_input_topic    =config.kafka_input_topic,
+        kafka_output_topic   =config.kafka_output_topic,
+        kafka_broker_address =config.kafka_broker_address,
+        ohlc_window_seconds  =config.ohlc_window_seconds,
     )
 
 

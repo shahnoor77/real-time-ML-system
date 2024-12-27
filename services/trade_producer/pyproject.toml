@@ -7,15 +7,8 @@ readme = "README.md"
 
 [tool.poetry.dependencies]
 python = "^3.10"
+websocket-client = "1.8.0"
 quixstreams = "2.5.1"
-websocket-client = "^1.8.0"
-loguru = "0.7.2"
-pydantic = "2.7.4"
-pydantic-settings = "2.3.0"
-python-dotenv = "1.0.1"
-pandas = "^2.2.3"
-ruff = "0.4.8"
-pytest = "8.3.3"
 
 
 [build-system]
