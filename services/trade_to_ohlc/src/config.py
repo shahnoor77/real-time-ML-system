@@ -1,18 +1,16 @@
-import os 
+import os
+
 from dotenv import load_dotenv, find_dotenv
- #load my .env file variables as environment variables so i can access them
- #with os.environ[] statements
+
+from pydantic_settings import BaseSettings
 
 load_dotenv(find_dotenv())
 
+class  Config(BaseSettings):
 
-from pydantic_settings import BaseSettings 
-
-class config(BaseSettings):
     kafka_broker_address: str = os.environ['KAFKA_BROKER_ADDRESS']
-    kafka_input_topic: str ="trade"
-    kafka_output_topic:  str = "ohlc"
-    ohlc_window_seconds: int = os.environ['OHLC_WINDOWS_SECONDS']
-    
+    kafka_input_topic:str  = 'trade'        #= os.environ['KAFKA_INPUT_TOPIC']
+    kafka_output_topic:str = 'ohlc'       #= os.environ['KAFKA_OUTPUT_TOPIC']
+    ohlc_windows_seconds: int = os.environ['OHLC_WINDOWS_SECONDS']
 
-config = config()
+config = Config()

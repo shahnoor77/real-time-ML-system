@@ -25,18 +25,18 @@ def push_data_to_feature_store(
     )
     # Get the feature store 
 
-    feature_store = project.get_featurestore()
+    feature_store = project.get_feature_store()
     # Get or create the feature group that will store the data
     # To get or create a feature group, we need to specify the name of the feature group and the version of the feature group.
     # If the feature group does not exist, it will be created.
 
-    ohlc_feature_group = feature_store.get_feature_group(
+    ohlc_feature_group = feature_store.get_or_create_feature_group(
         name = feature_group_name,
         version = feature_group_version,
-        description = "Feature group for storing OHLC data",
+        description = 'Feature group for storing OHLC data',
         primary_key = ["product_id", "timestamp"],
         event_time = "timestamp",
-        enabled_online = True,
+        online_enabled = True,
     )
 
     #transform the data into a pandas dataframe

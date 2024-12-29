@@ -12,6 +12,7 @@ loguru = "0.7.2"
 hopsworks = "^4.1.4"
 python-dotenv = "1.0.1"
 pydantic-settings = "2.3.1"
+pyarrow = "^18.1.0"
 
 
 [build-system]

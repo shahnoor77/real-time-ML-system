@@ -1,11 +1,13 @@
 from quixstreams import Application
 from datetime import timedelta
 from loguru import logger
+from src.config import config
+import pandas as pd
 def trade_to_ohlc(
     kafka_input_topic   : str,
     kafka_output_topic  : str,
     kafka_broker_address: str,
-    ohlc_window_seconds : int,
+    ohlc_windows_seconds : int,
 ) -> None:
     """
     Reads trades from the Kafka input topic,
@@ -23,7 +25,7 @@ def trade_to_ohlc(
     """
     app = Application(
         broker_address    =  kafka_broker_address,
-        consumer_group    = "trade_to_ohlc",
+        consumer_group    = "trade_to_ohlc", # read data from the beginning of the topic
         #auto_offset_reset = "earliest", # process all message from the input topic when this service starts
         #auto_create_reset = "latest",   #forget about the past messages, poduce only the once coming that moment 
     )
@@ -68,7 +70,7 @@ def trade_to_ohlc(
 
     # TODO: Apply transformations to the incoming data-start
     # Here we need to describe how we trnsform the incoming trades into ohlc candles
-    sdf = sdf.tumbling_window(duration_ms=timedelta(seconds=ohlc_window_seconds))
+    sdf = sdf.tumbling_window(duration_ms=timedelta(seconds=ohlc_windows_seconds))
     sdf = sdf.reduce(reducer=update_ohlc_candle, initializer=init_ohlc_candle).current()
 
     # Example: sdf = sdf.groupby("timestamp").aggregate(["open", "high", "low", "close"])
@@ -94,13 +96,13 @@ def trade_to_ohlc(
     app.run(sdf)
 
 if __name__ == '__main__':
-    from src.config import config
+    
 
     trade_to_ohlc(
-        kafka_input_topic    =config.kafka_input_topic,
-        kafka_output_topic   =config.kafka_output_topic,
-        kafka_broker_address =config.kafka_broker_address,
-        ohlc_window_seconds  =config.ohlc_window_seconds,
+        kafka_broker_address=config.kafka_broker_address,
+        kafka_input_topic=config.kafka_input_topic,
+        kafka_output_topic=config.kafka_output_topic,
+        ohlc_windows_seconds=config.ohlc_windows_seconds,
     )
 
 
