@@ -26,6 +26,7 @@ services:
       - redpanda_network
     environment:
       KAFKA_BROKER_ADDRESS: redpanda-0:9092
+      OHLC_WINDOWS_SECONDS: 10
     #env_file:
       #- ../services/trade_to_ohlc/setup_live_config.sh
     restart: always
@@ -37,7 +38,7 @@ services:
       - redpanda_network
     environment:
       KAFKA_BROKER_ADDRESS: redpanda-0:9092
-    #env_file:
-     # - ../services/kafka_to_feature_store/setup_live_config.sh
+    env_file:
+      - ../services/kafka_to_feature_store/.env
       #- ../services/kafka_to_feature_store/setup_credentials.sh
     restart: always

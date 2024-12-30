@@ -4,6 +4,8 @@ from dotenv import load_dotenv, find_dotenv
 load_dotenv(find_dotenv())
 from pydantic_settings import BaseSettings
 
+load_dotenv(find_dotenv())
+
 class Config(BaseSettings):
     kafka_broker_address: str
     feature_group_version: int
