@@ -86,3 +86,9 @@ class KrakenWebsocketTradeAPI:
         # print(f"Received message: {message}")
 
         # return message
+    def is_done(self) -> bool:
+        """
+        check if the response is done
+        the websocket never stops sending trades
+        """
+        return False
