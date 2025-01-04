@@ -11,6 +11,7 @@ def kafka_to_feature_store(
         kafka_broker_address  : str,
         feature_group_name    : str,           # store data to 
         feature_group_version : int, 
+        buffer_size           : int = 1,    # buffer size for the feature store
         
 )->None:
     """
@@ -23,6 +24,7 @@ def kafka_to_feature_store(
         kafka_broker_address (str): The address of the Kafka broker.
         feature_group_name (str): The name of the feature group to store data in.
         feature_group_version (int): The version of the feature group.
+        buffer_size (int): The number of records to buffer before writing to the feature store.
 
     Returns:
           None
@@ -32,8 +34,13 @@ def kafka_to_feature_store(
 
     broker_address= kafka_broker_address,
     consumer_group= "kafka_to_feature_store",
+    auto_offset_reset= "earliest", # start reading from the beginning of the topic
     
 )
+    #TODO : handle the case when the buffer is not full but no more data is coming
+    # with the current implementation we can have upto (buffer_size - 1) records in the buffer
+    # that are not written to the feature store
+    buffer = []
     with app.get_consumer() as consumer:
         consumer.subscribe(topics=[kafka_topic])
 
@@ -52,13 +59,29 @@ def kafka_to_feature_store(
 
                # 1. Parse the data from kafka into dictionary
                 ohlc = json.loads(msg.value().decode('utf-8'))
+                # add the data to the buffer
+                
+                buffer.append(ohlc)
+                # breakpoint()
+                # check if the buffer is full
+                if len(buffer) >= buffer_size:
+                    # push the data to the feature store
+                    push_data_to_feature_store(
+                        feature_group_name = feature_group_name,
+                        feature_group_version = feature_group_version,
+                        data = buffer,
+                    )
+                    # clear/reset the buffer
+                    buffer = []
 
                 # 2. Push the data to the feature store
-                push_data_to_feature_store(
-                    feature_group_name = feature_group_name,
-                    feature_group_version = feature_group_version,
-                    data = ohlc,
-                )
+                #push_data_to_feature_store(
+                #   feature_group_name = feature_group_name,
+                
+                #    feature_group_version = feature_group_version,
+                #    data = ohlc,
+                #)
+
                 # 3. Store the offset of the message    
                 # for the auto-commit mechanism
                 # It will send it to the kafka in the background
@@ -68,12 +91,18 @@ def kafka_to_feature_store(
 
 if __name__ == "__main__":
 
-    kafka_to_feature_store(
-        kafka_topic = config.kafka_topic,
-        kafka_broker_address = config.kafka_broker_address,
-        feature_group_name = config.feature_group_name,
-        feature_group_version = config.feature_group_version,
-    )
+    logger.debug(config.model_dump())
+    try:
+        kafka_to_feature_store(
+            kafka_topic = config.kafka_topic,
+            kafka_broker_address = config.kafka_broker_address,
+            feature_group_name = config.feature_group_name,
+            feature_group_version = config.feature_group_version,
+            buffer_size = config.buffer_size,
+        )
+    except KeyboardInterrupt:
+        logger.info("Exiting.....")
+   
 
                   
                     

@@ -35,10 +35,21 @@ def produce_trades(
         kraken_api = KrakenWebsocketTradeAPI(product_ids=product_ids)
     else:
         import time
-        to_ms = int(time.time() * 1000)
+        # get current date at midnight usiing UTC
+        from datetime import datetime 
+        from datetime import timezone
+        today_date = datetime.now(timezone.utc).replace(hour=0, minute=0, second=0, microsecond=0)
+
+        # today_date to mili seconds
+        to_ms = int(today_date.timestamp() * 1000)
         from_ms = to_ms - last_n_days * 24 * 60 * 60 * 1000
 
-        kraken_api = KrakenRestApi(product_ids=product_ids, from_ms=from_ms, to_ms=to_ms)    
+        kraken_api = KrakenRestApi(
+            product_ids=product_ids,
+           #from_ms=from_ms,
+           #to_ms=to_ms,
+           last_n_days=last_n_days,
+        )    
 
         logger.info('creating the producer...')
     # create a producer instance
@@ -52,7 +63,7 @@ def produce_trades(
 
             trades: List[Dict] = kraken_api.get_trades()
             # iterate over the trades
-            for trade in trades or []:
+            for trade in trades :
                 # serialize the trade using the defined topic
                 message = topic.serialize(key=trade['product_id'], value=trade)
                 # produce a message to the kafka topic

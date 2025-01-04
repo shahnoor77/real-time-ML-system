@@ -22,5 +22,5 @@ class Config(BaseSettings):
         'BTC/EUR',
     ]
     live_or_historical: str = 'live'
-    last_n_days: int = 7
+    last_n_days: int = 1
 config =  Config()

@@ -1,10 +1,11 @@
 import hopsworks
 from src.config import config
 import pandas as pd
+from typing import List, Dict
 def push_data_to_feature_store(
         feature_group_name    : str,      
         feature_group_version : int,
-        data                  : dict,
+        data                  : List[dict],
 )->None:
     """
      Pushes the given data to the feature store, writing it to the feature group with name
@@ -13,7 +14,7 @@ def push_data_to_feature_store(
     Args:
         feature_group_name (str): The name of the feature group to store data in.
         feature_group_version (int): The version of the feature group.
-        data (dict): The data to store in the feature group.
+        data (list[dict]): The data to store in the feature group.
         
     Returns:
           None
@@ -38,13 +39,15 @@ def push_data_to_feature_store(
         event_time = "timestamp",
         online_enabled = True,
     )
+    
 
     #transform the data into a pandas dataframe
-
-    df = pd.DataFrame([data])
+    #breakpoint()
+    df = pd.DataFrame(data)
 
     # Write the data to the feature group
-    ohlc_feature_group.insert(df)
+    ohlc_feature_group.insert(data, write_options = {"start_offline_meterialization": False}) #this will not write data from online feature store to offline feature store
+    # materializing means writing data from online feature store to offline feature store
     
 
   
