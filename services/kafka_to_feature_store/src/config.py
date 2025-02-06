@@ -1,4 +1,3 @@
-import os
 from dotenv import load_dotenv, find_dotenv
 
 load_dotenv(find_dotenv())
@@ -14,6 +13,7 @@ class Config(BaseSettings):
     kafka_topic: str
     feature_group_name: str 
     buffer_size: int = 1
+    live_or_historical :str = 'live' #by default we want this service to run in liv mode
 
     class Config:
         env_file = ".env"

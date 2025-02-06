@@ -1,11 +1,13 @@
 import hopsworks
 from src.config import config
 import pandas as pd
-from typing import List, Dict
+from typing import List
+
 def push_data_to_feature_store(
         feature_group_name    : str,      
         feature_group_version : int,
         data                  : List[dict],
+        online_or_offline : str,
 )->None:
     """
      Pushes the given data to the feature store, writing it to the feature group with name
@@ -24,13 +26,13 @@ def push_data_to_feature_store(
         project= config.hopsworks_project_name,
         api_key_value= config.hopsworks_api_key,
     )
-    # Get the feature store 
 
+    # Get the feature store 
     feature_store = project.get_feature_store()
+
     # Get or create the feature group that will store the data
     # To get or create a feature group, we need to specify the name of the feature group and the version of the feature group.
     # If the feature group does not exist, it will be created.
-
     ohlc_feature_group = feature_store.get_or_create_feature_group(
         name = feature_group_name,
         version = feature_group_version,
@@ -46,8 +48,14 @@ def push_data_to_feature_store(
     df = pd.DataFrame(data)
 
     # Write the data to the feature group
-    ohlc_feature_group.insert(data, write_options = {"start_offline_meterialization": False}) #this will not write data from online feature store to offline feature store
-    # materializing means writing data from online feature store to offline feature store
+    ohlc_feature_group.insert(
+        df,
+        write_options = {
+            "start_offline_meterialization": True if online_or_offline == 'offline' else False
+        }
+    ) 
+    # This will not write data from online feature store to offline feature store
+    # Materializing means writing data from online feature store to offline feature store
     
 
   

@@ -27,7 +27,7 @@ def trade_to_ohlc(
         broker_address    =  kafka_broker_address,
         consumer_group    = "trade_to_ohlc", # read data from the beginning of the topic
         #auto_offset_reset = "earliest", # process all message from the input topic when this service starts
-        #auto_create_reset = "latest",   #forget about the past messages, poduce only the once coming that moment 
+        auto_create_reset = "latest",   #forget about the past messages, poduce only the once coming that moment 
     )
     # Specify input and output topics for this application
     input_topic  = app.topic(name=kafka_input_topic, value_serializer='json')

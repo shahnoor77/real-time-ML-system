@@ -1,5 +1,5 @@
 
-name: feature_pipeline
+name: backfill_pipeline
 
 networks:
   redpanda_network:
@@ -15,9 +15,10 @@ services:
     environment:
       KAFKA_BROKER_ADDRESS: redpanda-0:9092
       LIVE_OR_HISTORICAL: historical
+      LAST_N_DAYS : 7
     #env_file:
      # - ../services/trade_producer/setup_live_config.sh
-    restart: always
+    #restart: always
 
   trade_to_ohlc:
     build:
@@ -26,10 +27,10 @@ services:
       - redpanda_network
     environment:
       KAFKA_BROKER_ADDRESS: redpanda-0:9092
-      OHLC_WINDOWS_SECONDS: 10
+      OHLC_WINDOWS_SECONDS: 60
     #env_file:
       #- ../services/trade_to_ohlc/setup_live_config.sh
-    restart: always
+    #restart: always
 
   kafka_to_feature_store:
     build:
@@ -38,6 +39,8 @@ services:
       - redpanda_network
     environment:
       KAFKA_BROKER_ADDRESS: redpanda-0:9092
+      LIVE_OR_HISTORICAL : historical
+      BUFFER_SIZE : 1000
     env_file:
       - ../services/kafka_to_feature_store/.env
       #- ../services/kafka_to_feature_store/setup_credentials.sh

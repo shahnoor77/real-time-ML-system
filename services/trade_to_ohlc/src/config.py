@@ -8,9 +8,9 @@ load_dotenv(find_dotenv())
 
 class  Config(BaseSettings):
 
-    kafka_broker_address: str = 'loacalhost:19092'
-    kafka_input_topic:str  = 'trade'        #= os.environ['KAFKA_INPUT_TOPIC']
-    kafka_output_topic:str = 'ohlc'       #= os.environ['KAFKA_OUTPUT_TOPIC']
-    ohlc_windows_seconds: int = os.environ['OHLC_WINDOWS_SECONDS']
+    kafka_broker_address: str 
+    kafka_input_topic:str  = ('trade')       #= os.environ['KAFKA_INPUT_TOPIC']
+    kafka_output_topic:str = ('ohlc')       #= os.environ['KAFKA_OUTPUT_TOPIC']
+    ohlc_windows_seconds: int 
 
 config = Config()

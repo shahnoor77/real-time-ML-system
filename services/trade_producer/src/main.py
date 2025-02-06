@@ -1,10 +1,12 @@
+import json
 from typing import Dict, List
-
 from loguru import logger
 from quixstreams import Application
-from src.kraken_api.rest import KrakenRestApi
-from src.kraken_api.websocket import KrakenWebsocketTradeAPI
 from src.config import config
+from src.kraken_api.rest import KrakenRestApiMultipleProducts
+from src.kraken_api.websocket import KrakenWebsocketTradeAPI
+
+
 def produce_trades(
     kafka_broker_address: str,  # from where to get the trades
     kafka_topic_name: str,  # where to save the trades
@@ -23,55 +25,47 @@ def produce_trades(
         None
     """
     assert live_or_historical in {'live', 'historical'}, f'Invalid value for live_or_historical: {live_or_historical}'
+    
+    # Create an Application instance to interact with Kafka
     app = Application(broker_address=kafka_broker_address)
 
+    # Create a Kafka topic with a JSON serializer for the values
     topic = app.topic(name=kafka_topic_name, value_serializer='json')
-    logger.info(f'creating the Kraken API instance...for {product_ids}')
+    logger.info(f'Creating the Kraken API instance for product IDs: {product_ids}')
 
-    # create an instance of the KrakenWebsocketTradeAPI
-    # for historical data, we use the KrakenRestApi
-    
+    # Instantiate the appropriate Kraken API based on the trade type (live or historical)
     if live_or_historical == 'live':
         kraken_api = KrakenWebsocketTradeAPI(product_ids=product_ids)
     else:
-        import time
-        # get current date at midnight usiing UTC
-        from datetime import datetime 
-        from datetime import timezone
-        today_date = datetime.now(timezone.utc).replace(hour=0, minute=0, second=0, microsecond=0)
-
-        # today_date to mili seconds
-        to_ms = int(today_date.timestamp() * 1000)
-        from_ms = to_ms - last_n_days * 24 * 60 * 60 * 1000
-
-        kraken_api = KrakenRestApi(
+        kraken_api = KrakenRestApiMultipleProducts(
             product_ids=product_ids,
-           #from_ms=from_ms,
-           #to_ms=to_ms,
-           last_n_days=last_n_days,
+            last_n_days=last_n_days,
         )    
 
-        logger.info('creating the producer...')
-    # create a producer instance
+    logger.info('Creating the Kafka producer...')
+    
+    # Start the producer within a context manager to ensure proper cleanup
     with app.get_producer() as producer:
         while True:
-            #check whether we are done fetching the trades 
+            # Check whether we've finished fetching all historical trades
             if kraken_api.is_done():
-                logger.info('done fetching the historical trades!')
+                logger.info('Done fetching the historical trades!')
                 break
-            # get the trades from the API
-
-            trades: List[Dict] = kraken_api.get_trades()
-            # iterate over the trades
-            for trade in trades :
-                # serialize the trade using the defined topic
-                message = topic.serialize(key=trade['product_id'], value=trade)
-                # produce a message to the kafka topic
-                producer.produce(topic=topic.name, value=message.value, key=message.key)
-                logger.info(trade)
-               
-
             
+            # Get a list of trades from the Kraken API
+            trades: List[Dict] = kraken_api.get_trades()
+            
+            # Iterate over the list of trades
+            for trade in trades:
+                # Serialize the trade and key, ensuring they're in the correct format for Kafka
+                key = str(trade['product_id']).encode('utf-8')  # Ensure the key is in bytes
+                value = json.dumps(trade).encode('utf-8')  # Serialize the trade to JSON and convert to bytes
+                
+                # Produce the trade message to Kafka
+                producer.produce(topic=topic.name, value=value, key=key)
+                
+                # Log the trade for monitoring purposes
+                logger.info(f"Produced trade: {trade}")
 
 
 if __name__ == '__main__':
@@ -80,11 +74,8 @@ if __name__ == '__main__':
             kafka_broker_address=config.kafka_broker_address,
             kafka_topic_name=config.kafka_topic_name,
             product_ids=config.product_ids,
-            # extra parameters that i need when running the trade producer
-            # against historical data from the kraken rest api
             live_or_historical=config.live_or_historical,
             last_n_days=config.last_n_days,
         )
     except KeyboardInterrupt:
-        logger.info('exiting the producer...')
-        
+        logger.info('Exiting the producer...')

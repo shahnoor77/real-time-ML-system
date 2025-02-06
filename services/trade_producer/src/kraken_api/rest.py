@@ -1,7 +1,62 @@
-from typing import List, Dict, Tuple
-import requests
 import json
+from typing import Dict, List
+
+import requests
 from loguru import logger
+from time import sleep
+
+
+class KrakenRestApiMultipleProducts:
+
+    def __init__(
+            self,
+            product_ids :List[str],
+            last_n_days: int,
+    )->None:
+        
+        self.product_ids = product_ids
+
+        self.kraken_apis = [
+            KrakenRestApi(product_ids=[product_id], last_n_days=last_n_days)
+            for product_id in product_ids
+        ]
+    def get_trades(self)->List[Dict]:
+        """
+        Get trade data from each Kraken_Api in  self.kraken_apis
+        Retruns list with all trades from all kraken_apis.
+        Args:
+            None
+        Retrun:
+            List(Dict): list of dictionaries, where each dictionary contain the trade data for 
+            all product_ids in self.product_ids
+         
+        """
+        trades : List[Dict]= []
+
+        for kraken_api in self.kraken_apis:
+            if kraken_api.is_done():
+                # if we are done fetching historical data for this product_id, we skip it.
+                continue
+
+            else:
+                trades += kraken_api.get_trades()
+
+        return trades
+    def is_done(self)->bool:
+        """
+        Return true if all kraken_api in self.kraken_apis are done fetching historical data
+        It returns False, otherwise!
+
+        """
+        for kraken_api in self.kraken_apis:
+            if not kraken_api.is_done():
+                return False
+            
+        return True
+
+
+        
+
 class KrakenRestApi:
     #URL = "https://api.kraken.com/0/public/Trades"
 
@@ -46,10 +101,8 @@ class KrakenRestApi:
         Returns:
             Tuple[int, int]: from_ms and to_ms timestamps
         """
-        import time
         # get current date at midnight using UTC
-        from datetime import datetime
-        from datetime import timezone
+        from datetime import datetime, timezone
         today_date = datetime.now(timezone.utc).replace(hour=0, minute=0, second=0, microsecond=0)
         # today_date to milliseconds
         to_ms = int(today_date.timestamp() * 1000)
@@ -80,8 +133,10 @@ class KrakenRestApi:
     # parse string into dictionary
         data = json.loads(response.text)
     #TODO    check for errors, right now we are not doing any error handling
-    #if data['error'] is not None:
-    #   raise Exception(data['error'])
+        if ('error' in data)and('EGeneral:Too many requests'in data['error'])!=[]:
+        # slow down the rate at which we are making requests to KrakenRestApi
+            logger.info('too many requests. sleeping for 30 seconds')
+            sleep(30)
          
         #print(response.text)
         
@@ -119,6 +174,7 @@ class KrakenRestApi:
         logger.debug(f'fetching {len(trades)} trades')
         # log the last trade timestamp
         logger.debug(f'last trade timestamp: {self.last_trade_ms}')
+        sleep(1)
         return trades
            
         

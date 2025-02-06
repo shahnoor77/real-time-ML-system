@@ -10,42 +10,42 @@ class KrakenWebsocketTradeAPI:
 
     def __init__(
         self,
-        product_id: str,
+        product_ids: str,
     ):
-        self.product_id = product_id
+        self.product_ids = product_ids
 
         self._ws = create_connection(self.URL)
         logger.info('Connected to Kraken Websocket')
 
         # subscribe to the trade for the given "product_id"
-        self._subscribe(product_id)
+        self._subscribe(product_ids)
 
-    def _subscribe(self, product_id: str):
+    def _subscribe(self, product_ids: str):
         """
         Subscribe to the trade for the given "product_id"
         """
 
-        logger.info(f'Subscribing to trade for {product_id}')
+        logger.info(f'Subscribing to trade for {product_ids}')
         # subscribe to the trade for the given "product_id"
 
         msg = {
             'method': 'subscribe',
             'params': {
                 'channel': 'trade',
-                'symbol': [
-                    product_id,
-                ],
+                'symbol': product_ids,
                 'snapshot': False,
             },
         }
+        
         self._ws.send(json.dumps(msg))  # send the message to the websocket
         # json.dump encode the message  from the dictionary to a string
         logger.info('subscription worked!')
 
         # dumping the first two messages because they are not trade messages
         # they are subscription confirmation messages
-        _ = self._ws.recv()
-        _ = self._ws.recv()
+        for product_id in product_ids:
+            _ = self._ws.recv()
+            _ = self._ws.recv()
 
     def get_trades(self) -> List[Dict]:
         # mock_trades = [
@@ -74,7 +74,7 @@ class KrakenWebsocketTradeAPI:
         for trade in message['data']:
             trades.append(
                 {
-                    'product_id': self.product_id,
+                    'product_id': self.product_ids,
                     'price': trade['price'],
                     'volume': trade['qty'],
                     'timestamp': trade['timestamp'],
