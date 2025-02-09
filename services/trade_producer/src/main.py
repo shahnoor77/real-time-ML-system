@@ -5,11 +5,11 @@ from quixstreams import Application
 from src.config import config
 from src.kraken_api.rest import KrakenRestApiMultipleProducts
 from src.kraken_api.websocket import KrakenWebsocketTradeAPI
-
+from src.kraken_api.trade import Trade
 
 def produce_trades(
     kafka_broker_address: str,  # from where to get the trades
-    kafka_topic_name: str,  # where to save the trades
+    kafka_topic: str,  # where to save the trades
     product_ids: List[str],  # which trades to get
     live_or_historical: str,  # live or historical trades
     last_n_days: int,  # how many days of historical trades to get
@@ -24,14 +24,14 @@ def produce_trades(
     Returns:
         None
     """
-    assert live_or_historical in {'live', 'historical'}, f'Invalid value for live_or_historical: {live_or_historical}'
+    #assert live_or_historical in {'live', 'historical'}, f'Invalid value for live_or_historical: {live_or_historical}'
     
     # Create an Application instance to interact with Kafka
     app = Application(broker_address=kafka_broker_address)
 
     # Create a Kafka topic with a JSON serializer for the values
-    topic = app.topic(name=kafka_topic_name, value_serializer='json')
-    logger.info(f'Creating the Kraken API instance for product IDs: {product_ids}')
+    topic = app.topic(name=kafka_topic, value_serializer='json')
+    logger.info(f'Creating the Kraken API to fetch data for {product_ids}')
 
     # Instantiate the appropriate Kraken API based on the trade type (live or historical)
     if live_or_historical == 'live':
@@ -53,26 +53,33 @@ def produce_trades(
                 break
             
             # Get a list of trades from the Kraken API
-            trades: List[Dict] = kraken_api.get_trades()
+            trades: List[Trade] = kraken_api.get_trades()
             
             # Iterate over the list of trades
             for trade in trades:
+                message = topic.serialize(
+                    key=trade.product_id,
+                    value = trade.model_dump(),
+                )
                 # Serialize the trade and key, ensuring they're in the correct format for Kafka
-                key = str(trade['product_id']).encode('utf-8')  # Ensure the key is in bytes
-                value = json.dumps(trade).encode('utf-8')  # Serialize the trade to JSON and convert to bytes
-                
                 # Produce the trade message to Kafka
-                producer.produce(topic=topic.name, value=value, key=key)
+                producer.produce(topic=topic.name,
+                                value= message.value,
+                                key=message.key
+                )
                 
                 # Log the trade for monitoring purposes
-                logger.info(f"Produced trade: {trade}")
+                logger.info(trade)
 
 
 if __name__ == '__main__':
+
+    logger.debug('Configuration:')
+    logger.debug(config.model_dump())
     try:
         produce_trades(
             kafka_broker_address=config.kafka_broker_address,
-            kafka_topic_name=config.kafka_topic_name,
+            kafka_topic_name=config.kafka_topic,
             product_ids=config.product_ids,
             live_or_historical=config.live_or_historical,
             last_n_days=config.last_n_days,
