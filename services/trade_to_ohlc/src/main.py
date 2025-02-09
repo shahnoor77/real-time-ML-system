@@ -2,12 +2,29 @@ from quixstreams import Application
 from datetime import timedelta
 from loguru import logger
 from src.config import config
+from typing import Any, List, Optional, Tuple
 import pandas as pd
+
+def custom_ts_extractor(
+    value: Any,
+    headers: Optional[List[Tuple[str, bytes]]],
+    timestamp: float,
+    timestamp_type #: TimestampType,
+) -> int:
+    """
+    Specifying a custom timestamp extractor to use the timestamp from the message payload 
+    instead of Kafka timestamp.
+    We want to use the `timestamp_ms` field from the message value, and not the timestamp
+    of the message that Kafka generates when the message is saved into the Kafka topic.
+    """
+    return value["timestamp_ms"]
+
 def trade_to_ohlc(
     kafka_input_topic   : str,
     kafka_output_topic  : str,
     kafka_broker_address: str,
-    ohlc_windows_seconds : int,
+    ohlc_window_seconds : int,
+    kafka_consumer_group: str,
 ) -> None:
     """
     Reads trades from the Kafka input topic,
@@ -25,12 +42,17 @@ def trade_to_ohlc(
     """
     app = Application(
         broker_address    =  kafka_broker_address,
-        consumer_group    = "trade_to_ohlc", # read data from the beginning of the topic
-        #auto_offset_reset = "earliest", # process all message from the input topic when this service starts
-        auto_create_reset = "latest",   #forget about the past messages, poduce only the once coming that moment 
+        consumer_group    = kafka_consumer_group, # read data from the beginning of the topic
+        auto_offset_reset = "earliest", # process all message from the input topic when this service starts
+        #auto_create_reset = "latest",   #forget about the past messages, poduce only the once coming that moment 
     )
     # Specify input and output topics for this application
-    input_topic  = app.topic(name=kafka_input_topic, value_serializer='json')
+    input_topic = app.topic(
+        name=kafka_input_topic,
+        value_serializer='json',
+        # timestamp_extractor=lambda x: x['timestamp_ms'],    
+        timestamp_extractor=custom_ts_extractor,
+    )
     output_topic = app.topic(name=kafka_output_topic, value_serializer='json')
 
     # Create a streaming DataFrame
@@ -42,14 +64,14 @@ def trade_to_ohlc(
 
         """
         return{
-            "open"  : value["price"],
-            "high"  : value["price"],
-            "low"   : value["price"],
-            "close" : value["price"],
-            "product_id":value["product_id"],
+            'open'  : value['price'],
+            'high'  : value['price'],
+            'low'   : value['price'],
+            'close' : value['price'],
+            'product_id':value['product_id'],
         }
 
-    def update_ohlc_candle(ohlc_candle : dict, trade : dict)->dict:
+    def update_ohlc_candle(ohlc_candle: dict, trade: dict)->dict:
         """
            update the ohlc candle with the new trade and returns the updated candle
         Args:
@@ -60,18 +82,18 @@ def trade_to_ohlc(
 
         """
         return{
-            "open"       : ohlc_candle["open"],
-            "high"       : max(ohlc_candle["high"], trade["price"]),
-            "low"        : min(ohlc_candle["low"], trade["price"]),
-            "close"      : trade["price"],
-            "product_id" : trade["product_id"],
+            'open'       : ohlc_candle['open'],
+            'high'       : max(ohlc_candle['high'], trade['price']),
+            'low'        : min(ohlc_candle['low'], trade['price']),
+            'close'      : trade['price'],
+            'product_id' : trade['product_id'],
         }
 
 
-    # TODO: Apply transformations to the incoming data-start
+    # Apply transformations to the incoming data-start
     # Here we need to describe how we trnsform the incoming trades into ohlc candles
-    sdf = sdf.tumbling_window(duration_ms=timedelta(seconds=ohlc_windows_seconds))
-    sdf = sdf.reduce(reducer=update_ohlc_candle, initializer=init_ohlc_candle).current()
+    sdf = sdf.tumbling_window(duration_ms=timedelta(seconds=ohlc_window_seconds))
+    sdf = sdf.reduce(reducer=update_ohlc_candle, initializer=init_ohlc_candle).final()
 
     # Example: sdf = sdf.groupby("timestamp").aggregate(["open", "high", "low", "close"])
     # Unpacking the value we want
@@ -99,10 +121,11 @@ if __name__ == '__main__':
     
 
     trade_to_ohlc(
-        kafka_broker_address=config.kafka_broker_address,
         kafka_input_topic=config.kafka_input_topic,
         kafka_output_topic=config.kafka_output_topic,
-        ohlc_windows_seconds=config.ohlc_windows_seconds,
+        kafka_broker_address=config.kafka_broker_address,
+        kafka_consumer_group=config.kafka_consumer_group,
+        ohlc_window_seconds=config.ohlc_window_seconds,
     )
 
 
