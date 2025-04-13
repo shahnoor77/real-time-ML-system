@@ -1,61 +1,63 @@
-import hopsworks
-from src.config import config
-import pandas as pd
 from typing import List
 
+import hopsworks
+import pandas as pd
+
+from src.config import config
+
+
 def push_data_to_feature_store(
-        feature_group_name    : str,      
-        feature_group_version : int,
-        data                  : List[dict],
-        online_or_offline : str,
-)->None:
+    feature_group_name: str,
+    feature_group_version: int,
+    data: List[dict],
+    online_or_offline: str,
+) -> None:
     """
-     Pushes the given data to the feature store, writing it to the feature group with name
-    "feature_group_name"  and "feature_group_version".
-    
+    Pushes the given `data` to the feature store, writing it to the feature group
+    with name `feature_group_name` and version `feature_group_version`.
+
     Args:
-        feature_group_name (str): The name of the feature group to store data in.
-        feature_group_version (int): The version of the feature group.
-        data (list[dict]): The data to store in the feature group.
-        
+        feature_group_name (str): The name of the feature group to write to.
+        feature_group_version (int): The version of the feature group to write to.
+        data (List[dict]): The data to write to the feature store.
+        online_or_offline (str): Whether we are saving the `data` to the online or offline
+        feature group
+
     Returns:
-          None
+        None
     """
     # Authenticate with Hopsworks API
-    project= hopsworks.login(
-        project= config.hopsworks_project_name,
-        api_key_value= config.hopsworks_api_key,
+    project = hopsworks.login(
+        project=config.hopsworks_project_name,
+        api_key_value=config.hopsworks_api_key,
     )
 
-    # Get the feature store 
+    # Get the feature store
     feature_store = project.get_feature_store()
 
-    # Get or create the feature group that will store the data
-    # To get or create a feature group, we need to specify the name of the feature group and the version of the feature group.
-    # If the feature group does not exist, it will be created.
+    # Get or create the feature group we will be saving feature data to
+    # Get or create the 'transactions' feature group
     ohlc_feature_group = feature_store.get_or_create_feature_group(
-        name = feature_group_name,
-        version = feature_group_version,
-        description = 'Feature group for storing OHLC data',
-        primary_key = ["product_id", "timestamp"],
-        event_time = "timestamp",
-        online_enabled = True,
+        name=feature_group_name,
+        version=feature_group_version,
+        description='OHLC data coming from Kraken',
+        primary_key=['product_id', 'timestamp'],
+        event_time='timestamp',
+        online_enabled=True,
     )
-    
 
-    #transform the data into a pandas dataframe
-    #breakpoint()
-    df = pd.DataFrame(data)
+    # breakpoint()
+
+    # transform the data (dict) into a pandas dataframe
+    data = pd.DataFrame(data)
 
     # Write the data to the feature group
-    ohlc_feature_group.insert(
-        df,
-        write_options = {
-            "start_offline_meterialization": True if online_or_offline == 'offline' else False
-        }
-    ) 
-    # This will not write data from online feature store to offline feature store
-    # Materializing means writing data from online feature store to offline feature store
-    
 
-  
+    ohlc_feature_group.insert(
+        data,
+        write_options={
+            'start_offline_materialization': True
+            if online_or_offline == 'offline'
+            else False
+        },
+    )

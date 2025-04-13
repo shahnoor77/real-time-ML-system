@@ -1,47 +1,54 @@
-
+# write a docker compose with 3 services
+# - services/trade_producer.py
+# - services/trade_to_ohlc.py
+# - services/kafka_to_feature_store.py
+# make sure that I can connect to the redpanda_broker
+version: "3.7"
 name: backfill_pipeline
 
 networks:
   redpanda_network:
-    name: redpanda_network
-    driver: bridge
+    external: true
 
-services:
+volumes:
+  trade-producer-volume:
+
+services:  
   trade_producer:
+    # container_name: trade_producer
     build:
       context: ../services/trade_producer
     networks:
       - redpanda_network
+    env_file:
+      - ../services/trade_producer/setup_historical_config.sh
     environment:
       KAFKA_BROKER_ADDRESS: redpanda-0:9092
-      LIVE_OR_HISTORICAL: historical
-      LAST_N_DAYS : 7
-    #env_file:
-     # - ../services/trade_producer/setup_live_config.sh
-    #restart: always
+    volumes:
+      - trade-producer-volume:/tmp/historical_trade_data
+    restart: on-failure
 
   trade_to_ohlc:
+    # container_name: trade_to_ohlc
     build:
       context: ../services/trade_to_ohlc
     networks:
       - redpanda_network
     environment:
       KAFKA_BROKER_ADDRESS: redpanda-0:9092
-      OHLC_WINDOWS_SECONDS: 60
-    #env_file:
-      #- ../services/trade_to_ohlc/setup_live_config.sh
-    #restart: always
+    env_file:
+      - ../services/trade_to_ohlc/setup_historical_config.sh
+    restart: always
 
   kafka_to_feature_store:
+    # container_name: kafka_to_feature_store
     build:
       context: ../services/kafka_to_feature_store
     networks:
       - redpanda_network
     environment:
       KAFKA_BROKER_ADDRESS: redpanda-0:9092
-      LIVE_OR_HISTORICAL : historical
-      BUFFER_SIZE : 1000
     env_file:
+      - ../services/kafka_to_feature_store/setup_historical_config.sh
       - ../services/kafka_to_feature_store/.env
-      #- ../services/kafka_to_feature_store/setup_credentials.sh
     restart: always
