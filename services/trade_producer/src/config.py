@@ -8,8 +8,11 @@ class Config(BaseSettings):
     kafka_broker_address: Optional[str] = None
     kafka_topic: str
     product_ids: List[str]
-    ive_or_historical: str
+
+    live_or_historical: str
+
     last_n_days: Optional[int] = 1
+    cache_dir_historical_data: Optional[str] = None
 
     @field_validator('live_or_historical')
     @classmethod

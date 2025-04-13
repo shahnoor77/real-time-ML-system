@@ -7,15 +7,17 @@ readme = "README.md"
 
 [tool.poetry.dependencies]
 python = "^3.10"
-websocket-client = "1.8.0"
-quixstreams = "2.5.1"
-loguru = "0.7.2"
-pydantic-settings = "2.3.0"
-python-dotenv = "1.0.1"
+quixstreams = "^2.5.1"
+websocket-client = "^1.8.0"
+loguru = "^0.7.2"
+python-dotenv = "^1.0.1"
+pydantic-settings = "^2.3.0"
+pydantic = "^2.7.4"
+fastparquet = "^2024.5.0"
 
 
 [tool.poetry.group.dev.dependencies]
-ruff = "0.4.7"
+ruff = "^0.4.7"
 
 [build-system]
 requires = ["poetry-core"]
@@ -31,4 +33,3 @@ docstring-code-format = true
 
 [tool.ruff.lint]
 extend-select = ["I"]
-
