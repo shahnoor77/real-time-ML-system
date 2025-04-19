@@ -34,7 +34,7 @@ run-historical: build
 		--env KAFKA_TOPIC=ohlc_historical \
 		--env KAFKA_CONSUMER_GROUP=ohlc_historical_consumer_group_NEW \
 		--env FEATURE_GROUP_NAME=ohlc_feature_group \
-		--env FEATURE_GROUP_VERSION=3 \
+		--env FEATURE_GROUP_VERSION=2 \
 		--env BUFFER_SIZE=150000 \
 		--env LIVE_OR_HISTORICAL=historical \
 		--env SAVE_EVERY_N_SEC=30 \
