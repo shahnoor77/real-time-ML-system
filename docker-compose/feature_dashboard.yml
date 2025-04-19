@@ -1,0 +1,10 @@
+# This file is used to run the feature dashboard in a Docker container.
+services:
+  feature_dashboard:
+    build:
+      context: ../services/feature_dashboard
+      dockerfile: Dockerfile
+    container_name: feature_dashboard
+    env_file:
+      - ../services/feature_dashboard/setup_config.sh
+      - ../services/feature_dashboard/setup_credential.sh
