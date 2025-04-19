@@ -1,6 +1,0 @@
-$env:HOPSWORKS_PROJECT_NAME="prediction"
-$env:PRODUCT_ID="BTC/USD"
-$env:FEATURE_GROUP_NAME="ohlc_feature_group"
-$env:FEATURE_GROUP_VERSION="1"
-$env:FEATURE_VIEW_NAME="ohlc_feature_view"
-$env:FEATURE_VIEW_VERSION="1"

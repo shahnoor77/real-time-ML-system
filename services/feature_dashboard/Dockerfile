@@ -22,7 +22,7 @@ ENV PYTHONPATH=/app
 COPY pyproject.toml poetry.lock /app/
 
 # Install Python dependencies using Poetry
-RUN poetry install --no-root  # Install dependencies but not the project itself
+RUN poetry install 
 
 # Copy the source code into the container
 COPY src /app/src

@@ -4,6 +4,6 @@ export HOPSWORKS_API_KEY=z1QAEGvE0ygHmL2u.GaIDGeO6pUklipx7rmpIRQo3DepqCzG4LUdsNP
 export HOPSWORKS_PROJECT_NAME=prediction
 export KAFKA_TOPIC=ohlc
 export FEATURE_GROUP_NAME=ohlc_feature_group
-export FEATURE_GROUP_VERSION=1
+
 
 

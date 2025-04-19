@@ -45,5 +45,5 @@ services:
       KAFKA_BROKER_ADDRESS: redpanda-0:9092
     env_file:
       - ../services/kafka_to_feature_store/setup_live_config.sh
-       ../services/kafka_to_feature_store/setup_credential.sh
+      - ../services/kafka_to_feature_store/setup_credential.sh
     restart: always

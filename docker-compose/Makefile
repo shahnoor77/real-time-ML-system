@@ -23,3 +23,6 @@ run-backfill-pipeline: build-backfill-pipeline
 
 stop-backfill-pipeline:
 	docker compose -f backfill_pipeline.yml down
+
+run-dashboard:
+	docker compose -f feature_dashboard.yml up -d
