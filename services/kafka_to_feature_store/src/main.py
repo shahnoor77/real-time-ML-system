@@ -159,7 +159,7 @@ def kafka_to_feature_store(
                             continue
 
                         # reset the buffer
-                        # Thanks Rosina!
+                       
                         buffer = []
 
                         last_saved_to_feature_store_ts = get_current_utc_sec()
