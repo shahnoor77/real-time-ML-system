@@ -182,8 +182,8 @@ class OhlcDataReader:
         """
         Reads OHLC data from the offline feature store for the given product_id
         """
-        to_timestamp_ms = int(time.time() * 1000)
-        from_timestamp_ms = to_timestamp_ms - last_n_days * 24 * 60 * 60 * 1000
+        from_timestamp_ms = int(1.71133e12)
+        to_timestamp_ms = int(1.7191e12)
         
         feature_view = self._get_feature_view()
         features = feature_view.get_batch_data()

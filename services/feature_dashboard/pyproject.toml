@@ -12,8 +12,9 @@ pydantic-settings = "^2.3.3"
 loguru = "^0.7.2"
 bokeh = "2.4.3"
 python-dotenv = "^1.1.0"
-hsfs = "3.7.9"
-hopsworks = "^4.2"
+
+click = "^8.1.8"
+hopsworks = "^4.2.1"
 
 
 [build-system]

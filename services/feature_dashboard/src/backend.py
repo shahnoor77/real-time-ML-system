@@ -2,8 +2,7 @@ from typing import List, Dict
 
 import hopsworks
 # from hopsworks.feature_store import FeatureView
-#from hsfs import FeatureStoreException
-
+from hsfs.client.exceptions import FeatureStoreException
 import pandas as pd
 from loguru import logger
 
@@ -73,13 +72,10 @@ def get_features_from_the_store(
         try:
             features: pd.DataFrame = feature_view.get_batch_data()
 
-        #except FeatureStoreException:
+        except FeatureStoreException:
             # breakpoint()
             # retry the call with the use_hive option. This is what Hopsworks recommends
-            # features: pd.DataFrame = feature_view.get_batch_data(read_options={"use_hive": True})
-        except Exception as e:
-                logger.warning(f"Initial read failed with error: {e}. Retrying with use_hive.")
-                features: pd.DataFrame = feature_view.get_batch_data(read_options={"use_hive": True})
+            features: pd.DataFrame = feature_view.get_batch_data(read_options={"use_hive": True})
     else:
         # we fetch from the online feature store.
         # we need to build this list of dictionaries with the primary keys
@@ -91,7 +87,11 @@ def get_features_from_the_store(
     # sort the features by timestamp (ascending)
     features = features.sort_values(by='timestamp')
 
+    # breakpoint()
 
+    # Python trick: You can also do a sort inplace. I think with this you avoid copying data and it is
+    # paster
+    # features.sort_values(by='timestamp', inplace=True)
 
     return features
 
@@ -108,6 +108,9 @@ def get_primary_keys(last_n_minutes: int) -> List[Dict]:
     # generate a list of timestamps in miliseconds for the last 'last_n_minutes' minutes
     timestamps = [current_utc - i * 60000 for i in range(last_n_minutes)]
     
+    # I've just sent the `kafka_to_feature_store` service pushing a candle for
+    # this timestamp for BTC/USD. Let's see if we can actually read it from the online store.
+    # timestamps = [1719068640000]
 
     # primary keys are pairs of product_id and timestamp
     primary_keys = [
@@ -117,6 +120,7 @@ def get_primary_keys(last_n_minutes: int) -> List[Dict]:
         } for timestamp in timestamps
     ]
 
+    # breakpoint()
 
     return primary_keys
 
