@@ -48,11 +48,12 @@ def interpolate_missing_candles(
 
     return ohlc_data
 
-
+'''
 def create_target_metric(
     ohlc_data: pd.DataFrame,
     ohlc_window_sec: int,
     prediction_window_sec: int,
+    discretization_thresholds: list,
 ) -> pd.DataFrame:
     """
     Creates the target metric by
@@ -74,10 +75,30 @@ def create_target_metric(
         prediction_window_sec % ohlc_window_sec == 0
     ), 'prediction_window_sec must be a multiple of ohlc_window_sec'
 
+
+
     n_candles_into_future = prediction_window_sec // ohlc_window_sec
 
     # create a new column with the percentage change in the close price n_candles_into_future
     ohlc_data['close_pct_change'] = ohlc_data['close'].pct_change(n_candles_into_future)
+    def discretize(
+            x: float
+    )-> int:
+        """
+        Discretizes the close price into 3 classes:
+        - 0: price decrease
+        - 1: price stable
+        - 2: price increase
+        """
+        if x < discretization_thresholds[1]:
+            return 1
+        elif x >= discretization_thresholds[1]:
+            return 2
+        else:
+            None
+        
+    # apply the discretization function to the close_pct_change column  
+    ohlc_data['target'] = ohlc_data['close_pct_change'].apply(discretize)
 
     # shift the target column by n_candles_into_future to have the target for the current candle
     ohlc_data['target'] = ohlc_data['close_pct_change'].shift(-n_candles_into_future)
@@ -87,4 +108,4 @@ def create_target_metric(
     # drop the last n_candles_into_future rows
     ohlc_data.dropna(subset=['target'], inplace=True)
 
-    return ohlc_data
+    return ohlc_data'''

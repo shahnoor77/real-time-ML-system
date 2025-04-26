@@ -8,6 +8,8 @@ readme = "README.md"
 [tool.poetry.dependencies]
 python = ">=3.10,<3.13"
 tools = {path = "../../tools", develop = true}
+ipykernel = "^6.29.5"
+scikit-learn = "^1.6.1"
 
 [build-system]
 requires = ["poetry-core"]
