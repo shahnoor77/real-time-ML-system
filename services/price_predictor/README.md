@@ -5,4 +5,5 @@ steps:
     Add missing rows, replace NaN values, etc.
 4 - Create a Target metric 
 5 - Train the Model
-    --pending....
+ Next step:
+ --push the model to model registry using COMET-ML
