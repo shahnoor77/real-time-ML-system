@@ -1,6 +1,8 @@
+from typing import Optional
+
 import pandas as pd
 import talib
-from typing import Optional
+
 
 def add_features(
         X: pd.DataFrame,

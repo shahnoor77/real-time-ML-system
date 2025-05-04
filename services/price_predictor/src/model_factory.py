@@ -1,9 +1,10 @@
 from typing import Optional
-from xgboost import XGBRegressor
-from sklearn.linear_model import Lasso
- 
+
 import pandas as pd
- 
+from sklearn.linear_model import Lasso
+from xgboost import XGBRegressor
+
+
 def fit_xgboost_regressor(
     X_train: pd.DataFrame,
     y_train: pd.Series,
