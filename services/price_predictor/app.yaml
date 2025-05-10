@@ -26,6 +26,11 @@ variables:
     multiline: false
     defaultValue: COMET_ML_WORK_SPACE
     required: true
+  - name: PRODUCT_ID
+    inputType: FreeText
+    multiline: false
+    defaultValue: USD/BTC
+    required: true
 dockerfile: Dockerfile
 runEntryPoint: src/main.py
 defaultFile: src/main.py
