@@ -4,6 +4,7 @@
 metadata:
   version: 1.0
 
-deployments: []
 
-topics: []
+# This section describes the Topics of the data pipeline
+topics:
+  - name: first_topic
