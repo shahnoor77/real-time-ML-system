@@ -1,5 +1,30 @@
 name: trade_to_ohlc
 language: python
+variables:
+  - name: KAFKA_INPUT_TOPIC
+    inputType: InputTopic
+    multiline: false
+    description: its an input topic to get trade data
+    defaultValue: trade
+    required: true
+  - name: KAFKA_OUTPUT_TOPIC
+    inputType: OutputTopic
+    multiline: false
+    description: kafka output topic where we push our ohlc data
+    defaultValue: ohlc
+    required: true
+  - name: KAFKA_CONSUMER_GROUP
+    inputType: FreeText
+    multiline: false
+    description: This is the group use to read data from the trade topic
+    defaultValue: trade_to_ohlc_consumer_group
+    required: true
+  - name: OHLC_WINDOW_SECONDS
+    inputType: FreeText
+    multiline: false
+    description: number of second of our candle
+    defaultValue: 60
+    required: true
 dockerfile: Dockerfile
 runEntryPoint: src/main.py
 defaultFile: src/main.py
