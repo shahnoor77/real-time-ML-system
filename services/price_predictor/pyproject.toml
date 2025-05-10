@@ -21,6 +21,10 @@ ta-lib = "^0.4.0"
 python-dotenv = "^1.0.1"
 pydantic-settings = "^2.3.0"
 pydantic = "^2.7.4"
+<<<<<<< HEAD
+=======
+
+>>>>>>> b5e79a6f9561ea1aeb6780890218bb3d3eaefc4d
 [tool.poetry.group.dev.dependencies]
 jupyter = "^1.0.0"
 ruff = "^0.0.286"
