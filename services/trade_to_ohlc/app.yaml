@@ -7,6 +7,12 @@ variables:
     description: its an input topic to get trade data
     defaultValue: trade
     required: true
+  - name: KAFKA_OUTPUT_TOPIC
+    inputType: OutputTopic
+    multiline: false
+    description: kafka output topic where we push our ohlc data
+    defaultValue: ohlc
+    required: true
 dockerfile: Dockerfile
 runEntryPoint: src/main.py
 defaultFile: src/main.py
