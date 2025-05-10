@@ -1,7 +1,7 @@
 import os
 import pickle
 from typing import Optional, Tuple
-
+from dotenv import load_dotenv
 import pandas as pd
 from comet_ml import Experiment
 from loguru import logger
@@ -10,7 +10,7 @@ from tools.ohlc_data_reader import OhlcDataReader
 
 from src.baseline_model import BaselineModel
 from src.feature_engineering import add_features
-
+load_dotenv()
 
 def train(
      feature_view_name: str,
@@ -243,11 +243,8 @@ def train(
          model_name = f'{product_id.replace("/","_")}_price_change_predictor'
     experiment.log_model(name=model_name, file_or_folder='./lasso_model.pkl')
  
-     # Last step in your training pipeline, is to push the model to the model registry
-     # if you are happy with the performance of the model
-     
      # In this case I want to push the model to the model registry, no matter its performance
-     # because I want us to move on to the next step in the project, which is the
+     # because we want us to move on to the next step in the project, which is the
      # inference pipeline and the deployment.
      # if test_mae < baseline_test_mae:
     if True:
