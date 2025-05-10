@@ -21,6 +21,11 @@ variables:
     multiline: false
     defaultValue: COMET_ML_API_KEY
     required: true
+  - name: COMET_ML_WORKSPACE
+    inputType: Secret
+    multiline: false
+    defaultValue: COMET_ML_WORK_SPACE
+    required: true
 dockerfile: Dockerfile
 runEntryPoint: src/main.py
 defaultFile: src/main.py
