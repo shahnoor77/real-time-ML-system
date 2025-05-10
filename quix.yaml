@@ -59,6 +59,40 @@ deployments:
         description: number of second of our candle
         required: true
         value: 60
+  - name: kafka_to_feature_store
+    application: services/kafka_to_feature_store
+    version: latest
+    deploymentType: Service
+    resources:
+      cpu: 200
+      memory: 500
+      replicas: 1
+    variables:
+      - name: KAFKA_TOPIC
+        inputType: InputTopic
+        description: ohlc topic to fetch ohlc candles
+        required: true
+        value: ohlc
+      - name: KAFKA_CONSUMER_GROUP
+        inputType: FreeText
+        description: consumer group to read data from ohlc topic
+        required: true
+        value: ohlc_consumer_group_99
+      - name: FEATURE_GROUP_NAME
+        inputType: FreeText
+        description: Hopsworks feature group to store trades
+        required: true
+        value: ohlc_feature_group
+      - name: BUFFER_SIZE
+        inputType: FreeText
+        description: buffer_Size
+        required: true
+        value: 1
+      - name: LIVE_OR_HISTORICAL
+        inputType: FreeText
+        description: fetching live data
+        required: true
+        value: live
 
 # This section describes the Topics of the data pipeline
 topics:

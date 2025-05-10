@@ -1,5 +1,42 @@
 name: kafka_to_feature_store
 language: python
+variables:
+  - name: KAFKA_TOPIC
+    inputType: InputTopic
+    multiline: false
+    description: ohlc topic to fetch ohlc candles
+    defaultValue: ohlc
+    required: true
+  - name: KAFKA_CONSUMER_GROUP
+    inputType: FreeText
+    multiline: false
+    description: consumer group to read data from ohlc topic
+    defaultValue: ohlc_consumer_group_99
+    required: true
+  - name: FEATURE_GROUP_NAME
+    inputType: FreeText
+    multiline: false
+    description: Hopsworks feature group to store trades
+    defaultValue: ohlc_feature_group
+    required: true
+  - name: BUFFER_SIZE
+    inputType: FreeText
+    multiline: false
+    description: buffer_Size
+    defaultValue: 1
+    required: true
+  - name: LIVE_OR_HISTORICAL
+    inputType: FreeText
+    multiline: false
+    description: fetching live data
+    defaultValue: live
+    required: true
+  - name: FEATURE_GROUP_VERSION
+    inputType: FreeText
+    multiline: false
+    description: version 1 for live data
+    defaultValue: 1
+    required: true
 dockerfile: Dockerfile
 runEntryPoint: src/main.py
 defaultFile: src/main.py
