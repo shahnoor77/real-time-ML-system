@@ -1,5 +1,5 @@
-from dotenv import load_dotenv
-load_dotenv()
+#from dotenv import load_dotenv
+#load_dotenv()
 
 # You can use Flask or FastAPI to create a REST API
 from flask import Flask, jsonify, request
