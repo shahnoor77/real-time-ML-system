@@ -191,3 +191,9 @@ trust_policy.json
 ca.cert
 *.pkl
 **/state
+compose.local.yaml
+.secrets
+.venv/
+certificates/
+.quix.yaml.variables
+kafka_to_feature_store/setup_credential.sh
