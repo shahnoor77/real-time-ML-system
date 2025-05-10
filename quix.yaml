@@ -141,7 +141,7 @@ deployments:
       - name: PRODUCT_ID
         inputType: FreeText
         required: true
-        value: USD/BTC
+        value: BTC/USD
 
 # This section describes the Topics of the data pipeline
 topics:
