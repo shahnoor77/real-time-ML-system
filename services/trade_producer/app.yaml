@@ -7,6 +7,12 @@ variables:
     description: The topic where we store trade data
     defaultValue: trade
     required: true
+  - name: PRODUCT_IDS
+    inputType: FreeText
+    multiline: false
+    description: list of product_ids we fetch from Kraken
+    defaultValue: '["BTC/USD","ETH/EUR","ETH/USD"]'
+    required: true
 dockerfile: Dockerfile
 runEntryPoint: src/main.py
 defaultFile: src/main.py
