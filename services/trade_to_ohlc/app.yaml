@@ -19,6 +19,12 @@ variables:
     description: This is the group use to read data from the trade topic
     defaultValue: trade_to_ohlc_consumer_group
     required: true
+  - name: OHLC_WINDOW_SECONDS
+    inputType: FreeText
+    multiline: false
+    description: number of second of our candle
+    defaultValue: 60
+    required: true
 dockerfile: Dockerfile
 runEntryPoint: src/main.py
 defaultFile: src/main.py
