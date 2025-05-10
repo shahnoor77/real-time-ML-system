@@ -19,6 +19,12 @@ variables:
     description: Hopsworks feature group to store trades
     defaultValue: ohlc_feature_group
     required: true
+  - name: BUFFER_SIZE
+    inputType: FreeText
+    multiline: false
+    description: buffer_Size
+    defaultValue: 1
+    required: true
 dockerfile: Dockerfile
 runEntryPoint: src/main.py
 defaultFile: src/main.py
