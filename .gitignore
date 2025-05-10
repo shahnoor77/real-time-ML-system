@@ -196,4 +196,4 @@ compose.local.yaml
 .venv/
 certificates/
 .quix.yaml.variables
-kafka_to_feature_store/setup_credential.sh
+services\kafka_to_feature_store\setup_credential.sh
