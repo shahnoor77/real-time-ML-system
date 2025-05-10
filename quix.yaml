@@ -30,6 +30,35 @@ deployments:
         description: This tells if we want to fetch live or historical trade
         required: true
         value: live
+  - name: trade_to_ohlc
+    application: services/trade_to_ohlc
+    version: latest
+    deploymentType: Service
+    resources:
+      cpu: 200
+      memory: 500
+      replicas: 1
+    variables:
+      - name: KAFKA_INPUT_TOPIC
+        inputType: InputTopic
+        description: its an input topic to get trade data
+        required: true
+        value: trade
+      - name: KAFKA_OUTPUT_TOPIC
+        inputType: OutputTopic
+        description: kafka output topic where we push our ohlc data
+        required: true
+        value: ohlc
+      - name: KAFKA_CONSUMER_GROUP
+        inputType: FreeText
+        description: This is the group use to read data from the trade topic
+        required: true
+        value: trade_to_ohlc_consumer_group
+      - name: OHLC_WINDOW_SECONDS
+        inputType: FreeText
+        description: number of second of our candle
+        required: true
+        value: 60
 
 # This section describes the Topics of the data pipeline
 topics:
