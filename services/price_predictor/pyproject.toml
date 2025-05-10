@@ -18,7 +18,9 @@ optuna = "^3.6.1"
 pandas = "^2.0.0"
 numpy = "^1.26.4"
 ta-lib = "^0.4.0"
-
+python-dotenv = "^1.0.1"
+pydantic-settings = "^2.3.0"
+pydantic = "^2.7.4"
 
 [tool.poetry.group.dev.dependencies]
 jupyter = "^1.0.0"
