@@ -13,6 +13,12 @@ variables:
     description: list of product_ids we fetch from Kraken
     defaultValue: '["BTC/USD","ETH/EUR","ETH/USD"]'
     required: true
+  - name: LIVE_OR_HISTORICAL
+    inputType: FreeText
+    multiline: false
+    description: This tells if we want to fetch live or historical trade
+    defaultValue: live
+    required: true
 dockerfile: Dockerfile
 runEntryPoint: src/main.py
 defaultFile: src/main.py
