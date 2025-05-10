@@ -93,9 +93,21 @@ deployments:
         description: fetching live data
         required: true
         value: live
+      - name: FEATURE_GROUP_VERSION
+        inputType: FreeText
+        description: version 1 for live data
+        required: true
+        value: 1
+      - name: HOPSWORKS_PROJECT_NAME
+        inputType: Secret
+        required: true
+        secretKey: HOPSWORKS_PROJECT_NAME
+      - name: HOPSWORKS_API_KEY
+        inputType: Secret
+        required: true
+        secretKey: HOPSWORKS_API_KEY
 
 # This section describes the Topics of the data pipeline
 topics:
-  - name: first_topic
   - name: trade
   - name: ohlc

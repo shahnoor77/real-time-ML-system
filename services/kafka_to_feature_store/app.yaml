@@ -37,6 +37,16 @@ variables:
     description: version 1 for live data
     defaultValue: 1
     required: true
+  - name: HOPSWORKS_PROJECT_NAME
+    inputType: Secret
+    multiline: false
+    defaultValue: HOPSWORKS_PROJECT_NAME
+    required: true
+  - name: HOPSWORKS_API_KEY
+    inputType: Secret
+    multiline: false
+    defaultValue: HOPSWORKS_API_KEY
+    required: true
 dockerfile: Dockerfile
 runEntryPoint: src/main.py
 defaultFile: src/main.py
