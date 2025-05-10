@@ -25,6 +25,12 @@ variables:
     description: buffer_Size
     defaultValue: 1
     required: true
+  - name: LIVE_OR_HISTORICAL
+    inputType: FreeText
+    multiline: false
+    description: fetching live data
+    defaultValue: live
+    required: true
 dockerfile: Dockerfile
 runEntryPoint: src/main.py
 defaultFile: src/main.py
