@@ -11,7 +11,7 @@
 import json
 import pickle
 from typing import List
-from dotenv import load_dotenv
+#from dotenv import load_dotenv
 
 import pandas as pd
 from loguru import logger
@@ -21,7 +21,7 @@ from src.data_preprocessing import interpolate_missing_candles
 from src.feature_engineering import add_features
 from src.utils import get_model_name
 from tools.ohlc_data_reader import OhlcDataReader
-load_dotenv()
+#load_dotenv()
 
 class PredictorOutput(BaseModel):
     """
