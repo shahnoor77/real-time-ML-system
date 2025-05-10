@@ -35,3 +35,4 @@ deployments:
 topics:
   - name: first_topic
   - name: trade
+  - name: ohlc
