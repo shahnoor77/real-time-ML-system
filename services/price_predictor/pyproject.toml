@@ -21,6 +21,7 @@ pydantic-settings = "^2.3.0"
 pydantic = "^2.7.4"
 hopsworks = "^4.2.0"
 hsfs = "^3.7.0"
+pyarrow = "^2.0.0"
 [tool.poetry.group.dev.dependencies]
 jupyter = "^1.0.0"
 
