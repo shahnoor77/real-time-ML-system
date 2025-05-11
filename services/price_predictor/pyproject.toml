@@ -17,9 +17,7 @@ gunicorn = "^22.0.0"
 tools = {path = "tools"}
 xgboost = "2.0.0"
 optuna = "^3.6.1"
-python-dotenv = "^1.0.1"
-pydantic-settings = "^2.3.0"
-pydantic = "^2.7.4"
+
 
 [tool.poetry.group.dev.dependencies]
 jupyter = "^1.0.0"
