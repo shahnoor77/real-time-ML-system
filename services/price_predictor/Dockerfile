@@ -16,8 +16,11 @@ RUN wget http://prdownloads.sourceforge.net/ta-lib/ta-lib-0.4.0-src.tar.gz && \
     make install && \
     cd .. && rm -rf ta-lib*
 
-# Set environment variable to disable buffering
-ENV PYTHONUNBUFFERED=1
+
+# Set environment variables
+ENV PYTHONUNBUFFERED=1 \
+    JUPYTER_PLATFORM_DIRS=1
+
 
 # Install Poetry
 RUN pip install poetry==1.8.5
