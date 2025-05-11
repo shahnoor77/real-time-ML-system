@@ -1,3 +1,4 @@
+# Use a specific Python version image
 FROM python:3.10.3-slim-buster
 
 # Install system dependencies
@@ -22,26 +23,26 @@ ENV PYTHONUNBUFFERED=1 \
 # Install Poetry
 RUN pip install poetry==1.8.5
 
-# Disable Poetry virtualenvs
+# Disable Poetry's virtual environment creation
 RUN poetry config virtualenvs.create false
 
-# Set working directory
+# Set working directory in the container
 WORKDIR /app
 
-# Copy Poetry files first (for better caching)
-COPY pyproject.toml poetry.lock ./
+# Copy Poetry configuration files first for better cache efficiency
+COPY pyproject.toml poetry.lock /app/
 
-# Copy tools directory early if it’s needed for install
-COPY tools ./tools
+# Copy tools directory (if needed for installation or as a source)
+COPY tools /app/tools
 
-# Install dependencies
+# Install dependencies using Poetry
 RUN poetry install --no-root --no-interaction --no-ansi
 
-# Copy the rest of the application
-COPY . .
+# Copy the rest of the application source code
+COPY . /app/
 
-# Expose application port
+# Expose the application port (default for Gunicorn)
 EXPOSE 80
 
-# Set default command
+# Set the default command to start Gunicorn with Poetry
 CMD ["poetry", "run", "gunicorn", "-w", "2", "-b", "0.0.0.0:80", "src.api:app"]
