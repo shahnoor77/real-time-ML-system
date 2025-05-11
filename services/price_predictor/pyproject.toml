@@ -2,7 +2,7 @@
 name = "src"
 version = "0.1.0"
 description = ""
-authors = ["Paulescu <plabartabajo@gmail.com>"]
+authors = ["shahnoor77 <shahnoorkhan9955@gmail.com>"]
 readme = "README.md"
 [tool.poetry.dependencies]
 python = ">=3.10,<3.13"
@@ -21,7 +21,8 @@ pydantic-settings = "^2.3.0"
 pydantic = "^2.7.4"
 hopsworks = "^4.2.0"
 hsfs = "^3.7.0"
-pyarrow = "^2.0.0"
+pyarrow = "^15.0.2"
+numpy = "^1.24"
 [tool.poetry.group.dev.dependencies]
 jupyter = "^1.0.0"
 
