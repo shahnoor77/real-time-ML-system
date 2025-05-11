@@ -7,7 +7,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     ca-certificates libopenblas-dev liblapack-dev \
     && rm -rf /var/lib/apt/lists/*
 
-# Install TA-Lib C library (required for Python ta-lib to work)
+# Install TA-Lib C library
 RUN wget -q http://prdownloads.sourceforge.net/ta-lib/ta-lib-0.4.0-src.tar.gz && \
     tar -xzf ta-lib-0.4.0-src.tar.gz && \
     cd ta-lib && \
@@ -22,26 +22,26 @@ ENV PYTHONUNBUFFERED=1 \
 # Install Poetry
 RUN pip install poetry==1.8.5
 
-# Disable Poetry virtualenvs for container use
+# Disable Poetry virtualenvs
 RUN poetry config virtualenvs.create false
 
 # Set working directory
 WORKDIR /app
 
-# Copy pyproject + lock first for cache
-COPY pyproject.toml poetry.lock /app/
+# Copy Poetry files first (for better caching)
+COPY pyproject.toml poetry.lock ./
 
-# Copy your tools package inside the service folder
-COPY tools /app/tools
+# Copy tools directory early if it’s needed for install
+COPY tools ./tools
 
 # Install dependencies
 RUN poetry install --no-root --no-interaction --no-ansi
 
-# Copy the entire service code
-COPY . /app
+# Copy the rest of the application
+COPY . .
 
-# Expose the default app port
+# Expose application port
 EXPOSE 80
 
-# Default command for running the price predictor (adjust if needed)
+# Set default command
 CMD ["poetry", "run", "gunicorn", "-w", "2", "-b", "0.0.0.0:80", "src.api:app"]
