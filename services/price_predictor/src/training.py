@@ -1,7 +1,7 @@
 import os
 import pickle
 from typing import Optional, Tuple
-#from dotenv import load_dotenv
+from dotenv import load_dotenv
 import pandas as pd
 from comet_ml import Experiment
 from loguru import logger
@@ -10,7 +10,7 @@ from tools.ohlc_data_reader import OhlcDataReader
 
 from src.baseline_model import BaselineModel
 from src.feature_engineering import add_features
-#load_dotenv()
+load_dotenv()
 
 def train(
      feature_view_name: str,
