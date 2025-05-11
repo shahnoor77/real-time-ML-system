@@ -1,47 +1,47 @@
-# Use a Debian-based slim Python image
 FROM python:3.10.3-slim-buster
 
-# Install build tools and TA-Lib dependencies
+# Install system dependencies
 RUN apt-get update && apt-get install -y \
-    gcc wget build-essential \
+    gcc gfortran wget build-essential \
     python3-dev libssl-dev libffi-dev \
-    gfortran libopenblas-dev liblapack-dev \
-    ca-certificates curl && \
-    apt-get clean && rm -rf /var/lib/apt/lists/*
+    ca-certificates libopenblas-dev liblapack-dev \
+    && apt-get clean && rm -rf /var/lib/apt/lists/*
 
-# Download and build TA-Lib from source
+# Install TA-Lib (required for ta-lib Python bindings)
 RUN wget http://prdownloads.sourceforge.net/ta-lib/ta-lib-0.4.0-src.tar.gz && \
     tar -xzf ta-lib-0.4.0-src.tar.gz && \
-    cd ta-lib && \
+    cd ta-lib/ && \
     ./configure --prefix=/usr && \
-    make && make install && \
+    make && \
+    make install && \
     cd .. && rm -rf ta-lib*
 
-# Set environment to ensure TA-Lib is found
-ENV LD_LIBRARY_PATH="/usr/lib:$LD_LIBRARY_PATH"
+# Set environment variable to disable buffering
 ENV PYTHONUNBUFFERED=1
 
 # Install Poetry
-RUN pip install --upgrade pip && pip install poetry==1.8.2
+RUN pip install poetry==1.8.5
+
+# Set Poetry to use system environment
+RUN poetry config virtualenvs.create false
 
 # Set working directory
 WORKDIR /app
 
-# Copy dependency files first for Docker caching
+# Copy only pyproject.toml and poetry.lock first for caching
 COPY pyproject.toml poetry.lock /app/
 
-# Pre-install packages prone to timeout in Quix
-RUN pip install wcwidth mistune
+# Copy tools dependency with its own pyproject.toml
+COPY tools /app/tools
 
-# Install project dependencies (disables venvs for Docker)
-RUN poetry config virtualenvs.create false && \
-    poetry install --no-interaction --no-ansi
+# Install dependencies
+RUN poetry install --no-root
 
-# Copy project files last to keep Docker caching efficient
-COPY . /app/
+# Copy the rest of the project
+COPY . /app
 
-# Expose app port (if Quix uses internal service discovery, this is optional)
+# Expose app port
 EXPOSE 80
 
-# Run your app with Gunicorn via Poetry
+# Run the service
 CMD ["poetry", "run", "gunicorn", "-w", "2", "-b", "0.0.0.0:80", "src.api:app"]
