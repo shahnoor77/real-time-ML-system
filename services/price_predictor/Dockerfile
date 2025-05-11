@@ -16,6 +16,7 @@ RUN wget http://prdownloads.sourceforge.net/ta-lib/ta-lib-0.4.0-src.tar.gz && \
     make && make install && \
     cd .. && rm -rf ta-lib*
 
+# Avoid buffering Python output
 ENV PYTHONUNBUFFERED=1
 
 # Install Poetry
@@ -24,8 +25,11 @@ RUN pip install --upgrade pip && pip install poetry==1.8.5
 # Set working directory
 WORKDIR /app
 
-# Copy dependency files
+# Copy dependency files first
 COPY pyproject.toml poetry.lock /app/
+
+# Copy local path dependencies (e.g. tools) before install
+COPY tools /app/tools
 
 # Pre-install large packages to avoid timeout
 RUN pip install numpy widgetsnbextension
@@ -34,7 +38,7 @@ RUN pip install numpy widgetsnbextension
 RUN poetry config virtualenvs.create false \
  && poetry install --no-interaction --no-ansi
 
-# Copy application source
+# Copy the rest of the application source code
 COPY . /app
 
 # Expose application port
