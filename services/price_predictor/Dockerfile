@@ -24,21 +24,24 @@ RUN pip install poetry==1.8.5
 # Set working directory
 WORKDIR /app
 
-# Copy pyproject and lock files first (to leverage Docker layer caching)
+# Copy pyproject and lock files
 COPY pyproject.toml poetry.lock ./
 
-# Copy local dependency (tools) directory before installing dependencies
+# Copy local dependency before installation
 COPY tools/ tools/
 
-# Install Python dependencies
+
+RUN pip install --no-binary :all: ta-lib
+
+# Install other Python dependencies
 RUN poetry config virtualenvs.create false && \
     poetry install --no-root
 
-# Copy full source code (including src/)
+# Copy the rest of the code
 COPY . .
 
 # Expose service port
 EXPOSE 80
 
-# Run the service using gunicorn
+# Run app using Gunicorn
 CMD ["poetry", "run", "gunicorn", "-w", "2", "-b", "0.0.0.0:80", "src.api:app"]
