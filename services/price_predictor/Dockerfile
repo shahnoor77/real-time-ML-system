@@ -7,14 +7,13 @@ RUN apt-get update && apt-get install -y \
     libopenblas-dev liblapack-dev gfortran \
     && apt-get clean && rm -rf /var/lib/apt/lists/*
 
-# Install TA-Lib C library
-# Install TA-Lib C library (only version 0.4.0 is available)
+# Install TA-Lib C library (only 0.4.0 is available)
 RUN wget http://prdownloads.sourceforge.net/ta-lib/ta-lib-0.4.0-src.tar.gz -O ta-lib-0.4.0-src.tar.gz && \
     tar -xzf ta-lib-0.4.0-src.tar.gz && cd ta-lib && \
     ./configure --prefix=/usr && make && make install && \
     cd .. && rm -rf ta-lib ta-lib-0.4.0-src.tar.gz
 
-# Set environment variables
+# Set environment variables for TA-Lib
 ENV TA_LIBRARY_PATH=/usr/lib
 ENV TA_INCLUDE_PATH=/usr/include
 ENV LD_LIBRARY_PATH="/usr/lib"
@@ -25,18 +24,21 @@ RUN pip install poetry==1.8.5
 # Set working directory
 WORKDIR /app
 
-# Copy pyproject and lock files
+# Copy pyproject and lock files first (to leverage Docker layer caching)
 COPY pyproject.toml poetry.lock ./
+
+# Copy local dependency (tools) directory before installing dependencies
+COPY tools/ tools/
 
 # Install Python dependencies
 RUN poetry config virtualenvs.create false && \
     poetry install --no-root
 
-# Copy source code
+# Copy full source code (including src/)
 COPY . .
 
-# Expose port
+# Expose service port
 EXPOSE 80
 
-# Run service
+# Run the service using gunicorn
 CMD ["poetry", "run", "gunicorn", "-w", "2", "-b", "0.0.0.0:80", "src.api:app"]
