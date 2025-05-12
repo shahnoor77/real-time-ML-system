@@ -10,8 +10,8 @@ RUN apt-get update && apt-get install -y \
 RUN apt-get install -y gfortran libopenblas-dev liblapack-dev
 
 # Download and install TA-Lib 0.6.3
-RUN wget https://github.com/ta-lib/ta-lib/releases/download/0.6.3/ta-lib-0.6.3-src.tar.gz && \
-    tar -xzf ta-lib-0.6.3-src.tar.gz && \
+RUN wget https://github.com/ta-lib/ta-lib/releases/download/0.4.0/ta-lib-0.4.0-src.tar.gz && \
+    tar -xzf ta-lib-0.4.0-src.tar.gz && \
     cd ta-lib/ && \
     ./configure --prefix=/usr --build=aarch64-unknown-linux-gnu && \
     make && \
@@ -23,12 +23,11 @@ RUN wget https://github.com/ta-lib/ta-lib/releases/download/0.6.3/ta-lib-0.6.3-s
 ENV PYTHONUNBUFFERED=1
 
 # install poetry inside the container
-RUN pip install poetry==1.8.2
+RUN pip install poetry==1.8.5
 
 WORKDIR /app
 
-# This line here is ugly as hell. Please don't do this.
-# Overwriting the PYTHONPATH environment variable is a bad practice.
+
 # add /app/src to PYTHONPATH
 # ENV PYTHONPATH "${PYTHONPATH}:/app/src"
 
