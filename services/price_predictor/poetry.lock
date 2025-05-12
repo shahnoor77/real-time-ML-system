@@ -4205,12 +4205,12 @@ tests = ["cython", "littleutils", "pygments", "pytest", "typeguard"]
 
 [[package]]
 name = "ta-lib"
-version = "0.6.3"
+version = "0.4.36"
 description = "Python wrapper for TA-Lib"
 optional = false
 python-versions = "*"
 files = [
-    {file = "ta_lib-0.6.3.tar.gz", hash = "sha256:0c628db09b3fab6e5c26979e608b674e7aecc10359c82ba8d53f729767a856ac"},
+    {file = "ta_lib-0.4.36.tar.gz", hash = "sha256:f1f7e9752350f3b37dc6f8dda4dfb92ab44fe9261427f5f40acc8d3d17ac1fad"},
 ]
 
 [package.dependencies]
@@ -4721,4 +4721,4 @@ scikit-learn = ["scikit-learn"]
 [metadata]
 lock-version = "2.0"
 python-versions = ">=3.10,<3.13"
-content-hash = "dcc0e905d7279fbad17988e5fc0b120530bec249d46a92bb40464324e9b455ce"
+content-hash = "fa8b294c42730354ebc3efd75987aa9067e70ba8d612c14dba3b22f260b22ad7"
