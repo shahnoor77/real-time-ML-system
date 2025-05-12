@@ -7,13 +7,15 @@ RUN apt-get update && apt-get install -y \
     libopenblas-dev liblapack-dev gfortran \
     && apt-get clean && rm -rf /var/lib/apt/lists/*
 
-# Install TA-Lib C library (v0.4.0)
-RUN wget https://sourceforge.net/projects/ta-lib/files/ta-lib/0.4.0/ta-lib-0.4.0-src.tar.gz/download -O ta-lib-0.4.0-src.tar.gz && \
-    tar -xzf ta-lib-0.4.0-src.tar.gz && cd ta-lib && \
+# Install TA-Lib C library
+RUN wget http://prdownloads.sourceforge.net/ta-lib/ta-lib-0.4.38-src.tar.gz -O ta-lib-0.4.38-src.tar.gz && \
+    tar -xzf ta-lib-0.4.38-src.tar.gz && cd ta-lib && \
     ./configure --prefix=/usr && make && make install && \
-    cd .. && rm -rf ta-lib ta-lib-0.4.0-src.tar.gz
+    cd .. && rm -rf ta-lib ta-lib-0.4.38-src.tar.gz
 
-# Set library path
+# Set environment variables
+ENV TA_LIBRARY_PATH=/usr/lib
+ENV TA_INCLUDE_PATH=/usr/include
 ENV LD_LIBRARY_PATH="/usr/lib"
 
 # Install Poetry
@@ -22,12 +24,11 @@ RUN pip install poetry==1.8.5
 # Set working directory
 WORKDIR /app
 
-# Add pyproject and lock first to cache dependencies
+# Copy pyproject and lock files
 COPY pyproject.toml poetry.lock ./
 
-# Use system TA-Lib and install ta-lib with no build isolation
+# Install Python dependencies
 RUN poetry config virtualenvs.create false && \
-    poetry run pip install --no-build-isolation --no-cache-dir ta-lib==0.4.0 && \
     poetry install --no-root
 
 # Copy source code
