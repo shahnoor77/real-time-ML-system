@@ -1,50 +1,42 @@
 FROM python:3.10.3-slim-buster
 
-# install gcc and python3-dev to compile Python packages
+# Install required system packages
 RUN apt-get update && apt-get install -y \
     gcc wget build-essential \
     python3-dev libssl-dev libffi-dev \
-    ca-certificates
+    ca-certificates gfortran \
+    libopenblas-dev liblapack-dev \
+    && apt-get clean && rm -rf /var/lib/apt/lists/*
 
-# Install additional libraries needed for scipy
-RUN apt-get install -y gfortran libopenblas-dev liblapack-dev
-
-# Download and install TA-Lib 0.6.3
-RUN wget https://github.com/ta-lib/ta-lib/releases/download/0.4.0/ta-lib-0.4.0-src.tar.gz && \
+# Download and install TA-Lib 0.4.0 from SourceForge
+RUN wget https://sourceforge.net/projects/ta-lib/files/ta-lib/0.4.0/ta-lib-0.4.0-src.tar.gz/download -O ta-lib-0.4.0-src.tar.gz && \
     tar -xzf ta-lib-0.4.0-src.tar.gz && \
-    cd ta-lib/ && \
-    ./configure --prefix=/usr --build=aarch64-unknown-linux-gnu && \
+    cd ta-lib && \
+    ./configure --prefix=/usr && \
     make && \
     make install && \
     cd .. && \
-    rm -rf ta-lib*
+    rm -rf ta-lib ta-lib-0.4.0-src.tar.gz
 
-# stream output to console
+# Ensure Python output is shown in logs
 ENV PYTHONUNBUFFERED=1
 
-# install poetry inside the container
+# Install Poetry
 RUN pip install poetry==1.8.5
 
+# Set working directory
 WORKDIR /app
 
-
-# add /app/src to PYTHONPATH
-# ENV PYTHONPATH "${PYTHONPATH}:/app/src"
-
-# copy the pyproject.toml and poetry.lock files into the container
+# Copy dependency files and install Python dependencies
 COPY pyproject.toml poetry.lock /app/
-
-# copy the tools directory into the container so that we can install it
 COPY tools /app/tools
+RUN poetry config virtualenvs.create false && poetry install --no-root
 
-# install Python dependencies from the pyproject.toml file
-RUN poetry install
-
-# copy all the source code into the container and the README file
+# Copy the rest of the source code
 COPY . /app
 
-# Expose the port that the application will run on
+# Expose application port
 EXPOSE 80
 
-# Command to run the application with Gunicorn
+# Run the application using Gunicorn
 CMD ["poetry", "run", "gunicorn", "-w", "2", "-b", "0.0.0.0:80", "src.api:app"]
