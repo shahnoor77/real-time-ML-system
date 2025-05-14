@@ -1,52 +1,51 @@
 FROM python:3.10.3-slim-buster
 
-# System dependencies
+# install gcc and python3-dev to compile Python packages
 RUN apt-get update && apt-get install -y \
-    build-essential \
-    gcc \
-    gfortran \
-    wget \
-    libffi-dev \
-    libssl-dev \
-    python3-dev \
-    libopenblas-dev \
-    liblapack-dev \
-    ca-certificates \
-    && apt-get clean && rm -rf /var/lib/apt/lists/*
+    gcc wget build-essential \
+    python3-dev libssl-dev libffi-dev \
+    ca-certificates
 
-# Install TA-Lib C library
+# Install additional libraries needed for scipy
+RUN apt-get install -y gfortran libopenblas-dev liblapack-dev
+
+# Download and install TA-Lib
 RUN wget http://prdownloads.sourceforge.net/ta-lib/ta-lib-0.4.0-src.tar.gz && \
-    tar -xzf ta-lib-0.4.0-src.tar.gz && cd ta-lib && \
-    ./configure --prefix=/usr && make && make install && \
-    cd .. && rm -rf ta-lib ta-lib-0.4.0-src.tar.gz
+    tar -xzf ta-lib-0.4.0-src.tar.gz && \
+    cd ta-lib/ && \
+    ./configure --prefix=/usr --build=aarch64-unknown-linux-gnu && \
+    make && \
+    make install && \
+    cd .. && \
+    rm -rf ta-lib*
 
-# Set environment variables for TA-Lib
-ENV TA_LIBRARY_PATH=/usr/lib
-ENV TA_INCLUDE_PATH=/usr/include
-ENV LD_LIBRARY_PATH="/usr/lib"
+# stream output to console
 ENV PYTHONUNBUFFERED=1
 
-# Install Poetry
-RUN pip install poetry==1.8.5
+# install poetry inside the container
+RUN pip install poetry==1.8.2
 
-# Set working directory
 WORKDIR /app
 
-# Pre-copy poetry files to leverage Docker caching
-COPY pyproject.toml poetry.lock ./
+# This line here is ugly as hell. Please don't do this.
+# Overwriting the PYTHONPATH environment variable is a bad practice.
+# add /app/src to PYTHONPATH
+# ENV PYTHONPATH "${PYTHONPATH}:/app/src"
 
-# Pre-copy tools directory to install local dependency
-COPY tools/ tools/
+# copy the pyproject.toml and poetry.lock files into the container
+COPY pyproject.toml poetry.lock /app/
 
-# Disable virtualenv creation and install dependencies
-RUN poetry config virtualenvs.create false && \
-    poetry install --no-root --no-interaction --no-ansi
+# copy the tools directory into the container so that we can install it
+COPY tools /app/tools
 
-# Copy the rest of the application
-COPY . .
+# install Python dependencies from the pyproject.toml file
+RUN poetry install
 
-# Expose the service port
+# copy all the source code into the container and the README file
+COPY . /app
+
+# Expose the port that the application will run on
 EXPOSE 80
 
-# Run the app with Gunicorn
+# Command to run the application with Gunicorn
 CMD ["poetry", "run", "gunicorn", "-w", "2", "-b", "0.0.0.0:80", "src.api:app"]
