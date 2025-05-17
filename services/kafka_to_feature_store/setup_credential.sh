@@ -1,5 +1,5 @@
-export HOPSWORKS_API_KEY=z1QAEGvE0ygHmL2u.GaIDGeO6pUklipx7rmpIRQo3DepqCzG4LUdsNPC8T8YOFJbVyco2fJVLV4SBahoB
-export HOPSWORKS_PROJECT_NAME=prediction    
+export HOPSWORKS_API_KEY=<'Hopsworks API /Changed'>
+export HOPSWORKS_PROJECT_NAME=<'Project name/Changed'>    
 export KAFKA_TOPIC=ohlc
 export FEATURE_GROUP_NAME=ohlc_feature_group
 
