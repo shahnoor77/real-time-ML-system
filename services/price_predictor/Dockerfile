@@ -15,15 +15,15 @@ RUN wget http://prdownloads.sourceforge.net/ta-lib/ta-lib-0.4.0-src.tar.gz && \
     cd ta-lib && \
     ./configure --prefix=/usr && \
     make && make install && \
-    cd .. && rm -rf ta-lib* 
+    cd .. && rm -rf ta-lib*
 
 # Install Poetry
 RUN pip install poetry==1.8.5
 
 WORKDIR /app
 
-# Install Python dependencies with ta-lib (needs C lib first)
-RUN pip install numpy==1.26.4 ta-lib==0.4.30
+# ✅ Install numpy (compatible version) and ta-lib
+RUN pip install numpy==1.23.5 ta-lib==0.4.30
 
 # Copy pyproject and poetry.lock (cached layer)
 COPY pyproject.toml poetry.lock /app/
@@ -31,7 +31,7 @@ COPY pyproject.toml poetry.lock /app/
 # Install other dependencies
 RUN poetry install --no-root
 
-# Copy app
+# Copy application files
 COPY . /app
 
 EXPOSE 80
