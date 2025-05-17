@@ -1,43 +1,34 @@
-FROM python:3.10.3-slim-buster
+FROM python:3.10-slim
 
-# System dependencies
-RUN apt-get update && apt-get install -y \
-    gcc wget build-essential \
-    python3-dev libssl-dev libffi-dev \
-    ca-certificates \
-    gfortran libopenblas-dev liblapack-dev \
-    libta-lib0 libta-lib0-dev
-
-# Download and install TA-Lib C library (0.4.0)
-RUN wget http://prdownloads.sourceforge.net/ta-lib/ta-lib-0.4.0-src.tar.gz && \
-    tar -xzf ta-lib-0.4.0-src.tar.gz && \
-    cd ta-lib && \
-    ./configure --prefix=/usr && \
-    make && \
-    make install && \
-    cd .. && \
-    rm -rf ta-lib*
-
-# Environment setup
+# Set non-interactive mode for apt
+ENV DEBIAN_FRONTEND=noninteractive
 ENV PYTHONUNBUFFERED=1
 
-# Install poetry
+# System dependencies (minimal set)
+RUN apt-get update && apt-get install -y \
+    gcc build-essential python3-dev libffi-dev \
+    && rm -rf /var/lib/apt/lists/*
+
+# Install Poetry
 RUN pip install poetry==1.8.5
 
+# Set working directory
 WORKDIR /app
 
-# Install ta-lib Python bindings separately before using poetry
-RUN pip install numpy==1.26.4 && pip install ta-lib==0.4.0
+# Install ta-lib Python binding (includes prebuilt C lib)
+RUN pip install numpy==1.26.4 ta-lib==0.4.30
 
-# Copy project files
+# Copy pyproject and lock file first (for Docker layer caching)
 COPY pyproject.toml poetry.lock /app/
-COPY tools /app/tools
 
-# Now let Poetry install the rest of the dependencies
+# Install project dependencies (except your own package)
 RUN poetry install --no-root
 
+# Copy the rest of the application
 COPY . /app
 
+# Expose the application port
 EXPOSE 80
 
+# Default command to run your app
 CMD ["poetry", "run", "gunicorn", "-w", "2", "-b", "0.0.0.0:80", "src.api:app"]
