@@ -1,34 +1,39 @@
 FROM python:3.10-slim
 
-# Set non-interactive mode for apt
 ENV DEBIAN_FRONTEND=noninteractive
 ENV PYTHONUNBUFFERED=1
 
-# System dependencies (minimal set)
+# Install system dependencies
 RUN apt-get update && apt-get install -y \
-    gcc build-essential python3-dev libffi-dev \
+    gcc build-essential wget \
+    python3-dev libffi-dev \
     && rm -rf /var/lib/apt/lists/*
+
+# Install TA-Lib C library (0.4.0)
+RUN wget http://prdownloads.sourceforge.net/ta-lib/ta-lib-0.4.0-src.tar.gz && \
+    tar -xvzf ta-lib-0.4.0-src.tar.gz && \
+    cd ta-lib && \
+    ./configure --prefix=/usr && \
+    make && make install && \
+    cd .. && rm -rf ta-lib* 
 
 # Install Poetry
 RUN pip install poetry==1.8.5
 
-# Set working directory
 WORKDIR /app
 
-# Install ta-lib Python binding (includes prebuilt C lib)
+# Install Python dependencies with ta-lib (needs C lib first)
 RUN pip install numpy==1.26.4 ta-lib==0.4.30
 
-# Copy pyproject and lock file first (for Docker layer caching)
+# Copy pyproject and poetry.lock (cached layer)
 COPY pyproject.toml poetry.lock /app/
 
-# Install project dependencies (except your own package)
+# Install other dependencies
 RUN poetry install --no-root
 
-# Copy the rest of the application
+# Copy app
 COPY . /app
 
-# Expose the application port
 EXPOSE 80
 
-# Default command to run your app
 CMD ["poetry", "run", "gunicorn", "-w", "2", "-b", "0.0.0.0:80", "src.api:app"]
