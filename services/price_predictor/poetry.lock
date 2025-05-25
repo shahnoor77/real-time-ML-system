@@ -4205,6 +4205,20 @@ pure-eval = "*"
 tests = ["cython", "littleutils", "pygments", "pytest", "typeguard"]
 
 [[package]]
+name = "ta-lib"
+version = "0.6.3"
+description = "Python wrapper for TA-Lib"
+optional = true
+python-versions = "*"
+files = [
+    {file = "ta_lib-0.6.3.tar.gz", hash = "sha256:0c628db09b3fab6e5c26979e608b674e7aecc10359c82ba8d53f729767a856ac"},
+]
+
+[package.dependencies]
+numpy = "*"
+setuptools = "*"
+
+[[package]]
 name = "termcolor"
 version = "3.1.0"
 description = "ANSI color formatting for output in terminal"
@@ -4708,4 +4722,4 @@ scikit-learn = ["scikit-learn"]
 [metadata]
 lock-version = "2.0"
 python-versions = ">=3.10,<3.13"
-content-hash = "43ff60782f2cd35727ac57c9eb3b262d20499faf02fd3ea3b6e12ada25dfb132"
+content-hash = "d8ae14e3eafc9400c91d970567bc65309e62e8cedb9694dc407e62bf6dd61cd2"
