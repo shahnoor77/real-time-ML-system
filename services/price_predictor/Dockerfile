@@ -1,46 +1,49 @@
 FROM python:3.10-slim
 
-ENV DEBIAN_FRONTEND=noninteractive
-ENV PYTHONUNBUFFERED=1
+# Install build tools and dependencies for TA-Lib and Python packages
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    gcc g++ make wget \
+    build-essential \
+    python3-dev \
+    libssl-dev libffi-dev \
+    gfortran \
+    libopenblas-dev liblapack-dev \
+    ca-certificates \
+    && rm -rf /var/lib/apt/lists/*
 
-# System dependencies
-RUN apt-get update && apt-get install -y \
-    build-essential wget gcc make \
-    libffi-dev libssl-dev python3-dev \
-    libopenblas-dev liblapack-dev gfortran \
-    && apt-get clean && rm -rf /var/lib/apt/lists/*
+# Download and build TA-Lib C library
+RUN wget http://prdownloads.sourceforge.net/ta-lib/ta-lib-0.4.0-src.tar.gz && \
+    tar -xzf ta-lib-0.4.0-src.tar.gz && \
+    cd ta-lib && \
+    ./configure --prefix=/usr && \
+    make && \
+    make install && \
+    cd .. && \
+    rm -rf ta-lib ta-lib-0.4.0-src.tar.gz
 
-# Install TA-Lib C library (only 0.4.0 is available)
-RUN wget http://prdownloads.sourceforge.net/ta-lib/ta-lib-0.4.0-src.tar.gz -O ta-lib-0.4.0-src.tar.gz && \
-    tar -xzf ta-lib-0.4.0-src.tar.gz && cd ta-lib && \
-    ./configure --prefix=/usr && make && make install && \
-    cd .. && rm -rf ta-lib ta-lib-0.4.0-src.tar.gz
-
-# Set environment variables for TA-Lib
+# Set environment variables so Python ta-lib can find the C library
 ENV TA_LIBRARY_PATH=/usr/lib
 ENV TA_INCLUDE_PATH=/usr/include
-ENV LD_LIBRARY_PATH="/usr/lib"
+# Disable Python output buffering
+ENV PYTHONUNBUFFERED=1
 
 # Install Poetry
 RUN pip install poetry==1.8.5
 
 WORKDIR /app
 
-# Copy pyproject and lock files
-COPY pyproject.toml poetry.lock ./
+# Copy dependency files
+COPY pyproject.toml poetry.lock /app/
 
-# Copy local dependency before installation
-COPY tools/ tools/
+# Copy local path dependencies needed for poetry install
+COPY tools /app/tools
 
+# Install dependencies
+RUN poetry config virtualenvs.create false \
+ && poetry install --no-root
 
-RUN pip install --no-binary :all: ta-lib
-
-# Install other Python dependencies
-RUN poetry config virtualenvs.create false && \
-    poetry install --no-root
-
-# Copy the rest of the code
-COPY . .
+# Now copy the rest of the app
+COPY . /app
 
 # Expose service port
 EXPOSE 80
