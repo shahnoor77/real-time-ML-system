@@ -6,7 +6,6 @@ authors = ["shahnoor77 <shahnoorkhan9955@gmail.com>"]
 readme = "README.md"
 [tool.poetry.dependencies]
 python = ">=3.10,<3.13"
-hopsworks = "^4.2.0"
 loguru = "^0.7.2"
 fire = "^0.6.0"
 
