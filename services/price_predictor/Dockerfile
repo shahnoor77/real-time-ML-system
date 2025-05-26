@@ -1,35 +1,27 @@
 FROM python:3.10-slim
 
-# Install build tools and dependencies for TA-Lib and Python packages
+# Install system dependencies, TA-Lib C library, and build tools
 RUN apt-get update && apt-get install -y --no-install-recommends \
-    gcc g++ make wget \
-    build-essential \
-    python3-dev \
+    gcc g++ make \
+    libta-lib0 libta-lib-dev \
     libssl-dev libffi-dev \
     gfortran \
     libopenblas-dev liblapack-dev \
+    python3-dev \
     ca-certificates \
+    wget \
     && rm -rf /var/lib/apt/lists/*
 
-# Download and build TA-Lib C library
-RUN wget http://prdownloads.sourceforge.net/ta-lib/ta-lib-0.4.0-src.tar.gz && \
-    tar -xzf ta-lib-0.4.0-src.tar.gz && \
-    cd ta-lib && \
-    ./configure --prefix=/usr && \
-    make && \
-    make install && \
-    cd .. && \
-    rm -rf ta-lib ta-lib-0.4.0-src.tar.gz
-
-# Set environment variables so Python ta-lib can find the C library
+# Set environment variables so ta-lib is correctly found
 ENV TA_LIBRARY_PATH=/usr/lib
 ENV TA_INCLUDE_PATH=/usr/include
-# Disable Python output buffering
+ENV LD_LIBRARY_PATH="/usr/lib:$LD_LIBRARY_PATH"
 ENV PYTHONUNBUFFERED=1
 
 # Install Poetry
 RUN pip install poetry==1.8.5
 
+# Set working directory
 WORKDIR /app
 
 # Copy dependency files
@@ -42,10 +34,10 @@ COPY tools /app/tools
 RUN poetry config virtualenvs.create false \
  && poetry install --no-root
 
-# Now copy the rest of the app
+# Copy the rest of the application
 COPY . /app
 
-# Expose service port
+# Expose app port
 EXPOSE 80
 
 # Run app using Gunicorn
