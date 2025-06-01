@@ -142,6 +142,7 @@ deployments:
         inputType: FreeText
         required: true
         value: BTC/USD
+    disabled: true
 
 # This section describes the Topics of the data pipeline
 topics:
