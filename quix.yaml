@@ -120,9 +120,9 @@ deployments:
         required: true
         secretKey: HOPSWORKS_API_KEY
       - name: HOPSWORKS_PROJECT_NAME
-        inputType: Secret
+        inputType: FreeText
         required: true
-        secretKey: HOPSWORKS_PROJECT_NAME
+        value: prediction
       - name: COMET_ML_PROJECT_NAME
         inputType: Secret
         required: true
