@@ -1,0 +1,42 @@
+[tool.poetry]
+name = "src"
+version = "0.1.0"
+description = ""
+authors = ["shahnoor77 <shahnoorkhan9955@gmail.com>"]
+readme = "README.md"
+[tool.poetry.dependencies]
+python = ">=3.10,<3.13"
+loguru = "^0.7.2"
+scikit-learn = "^1.5.0"
+
+comet-ml = "^3.43.2"
+matplotlib = "^3.9.0"
+flask = "^3.0.3"
+gunicorn = "^22.0.0"
+tools = {path = "tools"}
+
+optuna = "^3.6.1"
+python-dotenv = "1.0.1"
+pydantic-settings = "2.3.1"
+pyarrow = "^19.0.1"
+hopsworks = "^4.2.4"
+numpy = "1.24.4"
+pandas = "1.5.3"
+
+[tool.poetry.group.dev.dependencies]
+jupyter = "^1.0.0"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
+
+[tool.ruff]
+line-length = 88
+
+[tool.ruff.format]
+quote-style = "single"
+indent-style = "space"
+docstring-code-format = true
+
+[tool.ruff.lint]
+extend-select = ["I"]

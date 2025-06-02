@@ -1,0 +1,36 @@
+name: price_predictor
+language: python
+variables:
+  - name: HOPSWORKS_API_KEY
+    inputType: Secret
+    multiline: false
+    defaultValue: HOPSWORKS_API_KEY
+    required: true
+  - name: HOPSWORKS_PROJECT_NAME
+    inputType: Secret
+    multiline: false
+    defaultValue: HOPSWORKS_PROJECT_NAME
+    required: true
+  - name: COMET_ML_PROJECT_NAME
+    inputType: Secret
+    multiline: false
+    defaultValue: HOPSWORKS_PROJECT_NAME
+    required: true
+  - name: COMET_ML_API_KEY
+    inputType: Secret
+    multiline: false
+    defaultValue: COMET_ML_API_KEY
+    required: true
+  - name: COMET_ML_WORKSPACE
+    inputType: Secret
+    multiline: false
+    defaultValue: COMET_ML_WORK_SPACE
+    required: true
+  - name: PRODUCT_ID
+    inputType: FreeText
+    multiline: false
+    defaultValue: USD/BTC
+    required: true
+dockerfile: Dockerfile
+runEntryPoint: src/main.py
+defaultFile: src/main.py
