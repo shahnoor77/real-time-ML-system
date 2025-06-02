@@ -28,6 +28,7 @@ RUN pip install poetry==1.8.5
 WORKDIR /app
 COPY pyproject.toml poetry.lock /app/
 COPY tools /app/tools
+poetry add ta-lib@^0.4.0
 RUN poetry install
 
 COPY . /app
