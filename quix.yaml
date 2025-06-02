@@ -106,42 +106,6 @@ deployments:
         inputType: Secret
         required: true
         secretKey: HOPSWORKS_API_KEY
-  - name: price_predictor
-    application: services/price_predictor
-    version: latest
-    deploymentType: Service
-    resources:
-      cpu: 1000
-      memory: 2000
-      replicas: 1
-    publicAccess:
-      enabled: true
-      urlPrefix: price-predictor
-    variables:
-      - name: HOPSWORKS_API_KEY
-        inputType: Secret
-        required: true
-        secretKey: HOPSWORKS_API_KEY
-      - name: HOPSWORKS_PROJECT_NAME
-        inputType: Secret
-        required: true
-        secretKey: HOPSWORKS_PROJECT_NAME
-      - name: COMET_ML_PROJECT_NAME
-        inputType: Secret
-        required: true
-        secretKey: HOPSWORKS_PROJECT_NAME
-      - name: COMET_ML_API_KEY
-        inputType: Secret
-        required: true
-        secretKey: COMET_ML_API_KEY
-      - name: COMET_ML_WORKSPACE
-        inputType: Secret
-        required: true
-        secretKey: COMET_ML_WORK_SPACE
-      - name: PRODUCT_ID
-        inputType: FreeText
-        required: true
-        value: BTC/USD
 
 # This section describes the Topics of the data pipeline
 topics:
