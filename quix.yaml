@@ -111,8 +111,8 @@ deployments:
     version: latest
     deploymentType: Service
     resources:
-      cpu: 500
-      memory: 1000
+      cpu: 1000
+      memory: 2000
       replicas: 1
     variables:
       - name: HOPSWORKS_API_KEY
