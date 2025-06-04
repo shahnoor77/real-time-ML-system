@@ -114,6 +114,9 @@ deployments:
       cpu: 1000
       memory: 2000
       replicas: 1
+    publicAccess:
+      enabled: true
+      urlPrefix: price-predictor-c85a09e
     variables:
       - name: HOPSWORKS_API_KEY
         inputType: Secret
