@@ -31,6 +31,11 @@ variables:
     multiline: false
     defaultValue: USD/BTC
     required: true
+  - name: HOPSWORKS_PROJECT_NAME
+    inputType: FreeText
+    multiline: false
+    defaultValue: prediction
+    required: true
 dockerfile: Dockerfile
 runEntryPoint: src/main.py
 defaultFile: src/main.py
